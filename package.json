@@ -1,0 +1,28 @@
+{
+  "name": "rescutime_projectime",
+  "version": "1.0.0",
+  "description": "calculate time spent on a project based on queries to rescutime tracking data",
+  "main": "index.js",
+  "dependencies": {
+    "rescuetime": "^0.2.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/haleagar/rescutime_projectime.git"
+  },
+  "keywords": [
+    "rescuetime",
+    "time",
+    "tracking"
+  ],
+  "author": "Hal Eagar",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/haleagar/rescutime_projectime/issues"
+  },
+  "homepage": "https://github.com/haleagar/rescutime_projectime#readme"
+}
