@@ -5,8 +5,150 @@
     <title>Rescuetime Data Query for Time Reports</title>
     <script src="node_modules/jsonq/jsonQ.min.js"></script>
     <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <style type="text/css">
+        table {
+            font-family: "Helvetica", "Lucida Sans", "Lucida Sans Unicode", "Luxi Sans", Tahoma, sans-serif;
+            box-shadow: 1px 1px 10px rgba(0,0,0,0.5);
+            border-collapse: collapse;
+            border-spacing: 0;
+        }
+        table {
+            margin: auto;
+        }
+        table, td, th {
+            padding: 5px;
+            text-align: center;
+            border: 1px solid rgb(8,48,107);
+        }
+        th {
+            background-color: rgb(8,81,156);
+            color: white;
+        }
+        .col-project th {
+            font-size: 8px;
+            padding: 5px 0;
+        }
+        td.col-data, tr.col-data {
+            display: none;
+        }
+        #tabs-data , #tabs-projects {
+            width: 45%;
+            float: left;
+        }
+    </style>
     <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script>
+        // thanks to https://jsfiddle.net/7og5348w/3/
+        function addTable(list, appendObj) {
+            var columns = addAllColumnHeaders(list, appendObj);
+
+            for (var i = 0; i < list.length; i++) {
+                var row$ = $('<tr/>');
+                for (var colIndex = 0; colIndex < columns.length; colIndex++) {
+                    var cellValue = list[i][columns[colIndex]];
+
+                    if (cellValue == null) {
+                        cellValue = "";
+                    }
+
+                    if (cellValue.constructor === Array)
+                    {
+                        $a = $('<td/>');
+                        row$.append($a);
+                        addTable(cellValue, $a);
+                        $a.addClass('col-'+columns[colIndex]);
+
+                    } else if (cellValue.constructor === Object)
+                    {
+
+                        var array = $.map(cellValue, function (value, index) {
+                            return [value];
+                        });
+
+                        $a = $('<td/>');
+                        row$.append($a);
+                        addObject(array, $a);
+                        $a.addClass('col-'+columns[colIndex]);
+
+                    } else {
+                        if (colIndex <= 1 ) {row$.addClass('row-'+cellValue);}
+
+                        var $newTD = $('<td/>').html(cellValue);
+                        row$.append($newTD);
+                        $newTD.addClass('col-'+columns[colIndex]);
+                    }
+                }
+                appendObj.append(row$);
+            }
+        }
+
+
+        function addObject(list, appendObj) {
+            for (var i = 0; i < list.length; i++) {
+                var row$ = $('<tr/>');
+
+                var cellValue = list[i];
+
+                if (cellValue == null) {
+                    cellValue = "";
+                }
+
+                if (cellValue.constructor === Array)
+                {
+                    $a = $('<td/>');
+                    row$.append($a);
+                    addTable(cellValue, $a);
+                    $a.addClass('col-'+columns[colIndex]);
+
+
+                } else if (cellValue.constructor === Object)
+                {
+
+                    var array = $.map(cellValue, function (value, index) {
+                        return [value];
+                    });
+
+                    $a = $('<td/>');
+                    row$.append($a);
+                    addObject(array, $a);
+                    $a.addClass('col-'+columns[colIndex]);
+
+                } else {
+                    var $newTD = $('<td/>').html(cellValue);
+                    row$.append($newTD);
+                    $newTD.addClass('col-');
+                }
+                appendObj.append(row$);
+            }
+        }
+
+        // Adds a header row to the table and returns the set of columns.
+        // Need to do union of keys from all records as some records may not contain
+        // all records
+        function addAllColumnHeaders(list, appendObj)
+        {
+            var columnSet = [];
+            var headerTr$ = $('<tr/>');
+
+            for (var i = 0; i < list.length; i++) {
+                var rowHash = list[i];
+                for (var key in rowHash) {
+                    if ($.inArray(key, columnSet) == -1) {
+                        columnSet.push(key);
+                        var $newTR = $('<th/>').html(key)
+                        headerTr$.append($newTR);
+                        $newTR.addClass('col-'+key);
+                    }
+                }
+            }
+            appendObj.append(headerTr$);
+
+            return columnSet;
+        }
+
+    </script>
+
     <script>
         //$( document ).ready(function() {
         $( function() {
@@ -36,13 +178,40 @@
             document.probablyproj['DOOR3'] =$('#probablykeywords-door3').val().toLowerCase().trim().split("\n");
             document.jsonQobj = {};
             document.strucData = {};
+            document.strucArray = [];
+            $( "#tabs-data" ).tabs();
+            $( "#tabs-projects" ).tabs();
             var day = "2017-01-09";
             var rtAPIkey = 'B639daNB9cIPMCFK3ulFjwliHdu5Eygc2Bw0BW8T';
             var apiURL = "https://www.rescuetime.com/anapi/data";//?callback=?
             $.ajaxSetup({ dataType: "jsonp" });
             $( "#datepicker" ).datepicker();
+
+            $('a#show-data').click( function( event ) {
+                event.preventDefault();
+                $('td.col-data').show();
+                $('th.col-data').show();
+            });
+            $('a#hide-data').click( function( event ) {
+                event.preventDefault();
+                $('td.col-data').hide();
+                $('th.col-data').hide();
+            });
+            $('a#show-projects').click( function( event ) {
+                event.preventDefault();
+                $('td.col-project').show();
+                $('th.col-project').show();
+            });
+            $('a#hide-projects').click( function( event ) {
+                event.preventDefault();
+                $('td.col-project').hide();
+                $('th.col-project').hide();
+            });
             $( "button#load-data" ).click( function( event ) {
                 event.preventDefault();
+                $('#restructured-data-table tr').remove();
+                document.strucData = {};
+                document.strucArray = [];
                 var currentDate = $( "#datepicker" ).datepicker( "getDate" );
                 day = $.datepicker.formatDate( "yy-mm-dd", currentDate );
                 console.log("day",day);
@@ -55,7 +224,7 @@
                     rk: 'document',
                     format: "json"
                 }).done(function( data ) {
-                    $("#preview-json").val(data['rows']);
+
                     //console.log('data notes',data['notes']);
                     console.log('data row_headers',data['row_headers']);
                     //console.log('data rows',data['rows']);
@@ -65,54 +234,71 @@
                         var duration = row[1];
                         var app = row[3];
                         var title = row[4];
-                        var rowObj = {time:time,duration:duration,app:app,title:title,project:'UNALOCATED'};
+                        var category = row[5];
+                        var rowObj = {time:time,project:'UNALOCATED',duration:duration,category:category,app:app,title:title};
                         if (document.strucData[time] == undefined) {
-                            document.strucData[time] = {total:0,missing:0,project:{UNALOCATED:0},timefixed:{},data:[]};
+                            document.strucData[time] = {timeslice:time,total:0,missing:0,project:[{UNALOCATED:0},{}],data:[]};
+
+                            document.strucArray.push(document.strucData[time]);
                             $.each( document.proj, function( projname, keywords ) {
-                                document.strucData[time]['project'][projname] = 0;
-                                document.strucData[time]['timefixed'][projname] = 0;
+                                document.strucData[time].project[0][projname] = 0;
+                                //project[1] is fixedup time
+                                if (projname != 'DOOR3') {document.strucData[time].project[1][projname] = 0;}
                             });
                         }
                         document.strucData[time]['data'].push( rowObj );
                         document.strucData[time]['total'] += duration;
                         document.strucData[time]['missing'] = 300 - document.strucData[time]['total'];
-
                         $.each( document.proj, function( projname, keywords ) {
-                            if (keywords.some(function(v) { return (app+' '+title).toLowerCase().indexOf(v) >= 0; }))  {
-                                document.strucData[time]['project'][projname]    += duration;
-                                rowObj['project'] = projname;
+                            if (rowObj['project'] == 'UNALOCATED') {
+                                if (keywords.some(function (v) {
+                                            return (title).toLowerCase().indexOf(v) >= 0;
+                                        })) {
+                                    document.strucData[time].project[0][projname] += duration;
+                                    rowObj['project'] = projname;
+                                }
                             }
                         });
                         $.each( document.probablyproj, function( projname, keywords ) {
-                            if (keywords.some(function(v) { return (app+' '+title).toLowerCase().indexOf(v) >= 0; }))  {
-                                document.strucData[time]['project'][projname]    += duration;
-                                rowObj['project'] = projname;
+                            if (rowObj['project'] == 'UNALOCATED') {
+                                if (keywords.some(function(v) { return (title).toLowerCase().indexOf(v) >= 0; }))  {
+                                    document.strucData[time].project[0][projname]    += duration;
+                                    rowObj['project'] = projname;
+                                }
                             }
                         });
-                        if (rowObj['project'] == 'UNALOCATED') { document.strucData[time]['project']['UNALOCATED']    += duration; }
+                        if (rowObj['project'] == 'UNALOCATED') { document.strucData[time].project[0]['UNALOCATED']    += duration; }
                     });
 
                     $.each( document.strucData, function( timeslice, row ) {
-                       // fix up data, distribute missing, DOOR3, and UNALOCATED proportionaly across other projects
-                       // sum loose time
-                       // calc % of remaining time existing on other projects
-                       // divide remaing time by each proj %, floor it, add it to proj (in new obj)
-                       // check total in new obj and fill roudning error on largest proj
+                        // fix up data, distribute missing, DOOR3, and UNALOCATED proportionaly across other projects
+                        // sum loose time
+                        // calc % of remaining time existing on other projects
+                        // divide remaing time by each proj %, floor it, add it to proj (in new obj)
+                        // check total in new obj and fill roudning error on largest proj
 
                         $.each( document.probablyproj, function( projname, keywords ) {
-                            document.strucData[timeslice]['timefixed'][projname] = 0;
+                            //project[1] is fixedup time
+                            document.strucData[timeslice].project[1][projname] = 0;
                         });
                     });
 
                     $.each( document.strucData, function( timeslice, row ) {
-                       // sum proj totals
+                        // sum proj totals
                     });
 
-                    document.jsonQobj=jsonQ(document.strucData);
-                    document.WAHV = document.jsonQobj.find('document',function () {
-                        return this[3].toLowerCase().indexOf('wahv') !== -1;
-                        //return this[0].toLowerCase().includes('wahv');
+                    addTable(document.strucArray, $("#restructured-data-table"));
+
+                    $('tr').click( function( event ) {
+                        event.preventDefault();
+                        $(this).find('td.col-data').toggle();
                     });
+
+//                    document.jsonQobj=jsonQ(document.strucData);
+//                    document.WAHV = document.jsonQobj.find('document',function () {
+//                        return this[3].toLowerCase().indexOf('wahv') !== -1;
+//                        //return this[0].toLowerCase().includes('wahv');
+//                    });
 
                 });
             } );
@@ -124,7 +310,27 @@
 <body>
 
 <label>Pick a day to load: </label><div id="datepicker"></div>
-<br><button id="load-data" class="ui-button ui-widget ui-corner-all">load data</button>
+<button id="load-data" class="ui-button ui-widget ui-corner-all">load data</button>
+<div id="tabs-data">
+    <ul>
+        <li><a id="hide-data" href="#tabs-1">hide detail data</a></li>
+        <li><a id="show-data" href="#tabs-2">show detail data</a></li>
+    </ul>
+    <div id="tabs-1"></div>
+    <div id="tabs-2"></div>
+</div>
+<div id="tabs-projects">
+    <ul>
+        <li><a id="show-projects" href="#tabs-3">show projects</a></li>
+        <li><a id="hide-projects" href="#tabs-4">hide projects</a></li>
+    </ul>
+    <div id="tabs-3"></div>
+    <div id="tabs-4"></div>
+</div>
+<div id="restructured-data">
+    <table id="restructured-data-table" border="1"></table>
+</div>
+
 <div><h1>Projects</h1>
 
     <div id="wahv">
@@ -143,7 +349,7 @@ postgres
 knex
 data:
         </textarea>
-           <h3><label>Probably Keywords</label></h3>
+        <h3><label>Probably Keywords</label></h3>
         <textarea title="probablykeywords-wahv" id="probablykeywords-wahv" rows="10" cols="50">
 chimp
 webdriver
@@ -239,7 +445,15 @@ doctor
 vlc
 youtube
 facebook
-maps
+        </textarea>
+
+        <h3><label>Probably Keywords</label></h3>
+        <textarea title="categorykeywords-personal" id="categorykeywords-personal" rows="10" cols="50">
+General Shopping
+General News & Opinion
+Kids Use
+General Entertainment
+Maps & Regional
         </textarea>
     </div>   <br>
 
@@ -283,7 +497,7 @@ searchmonkey
     </div>   <br>
 
 </div><br>
-<textarea title="debug dump" id="preview-json"  rows="100" cols="80"></textarea>
+
 </body>
 </html>
 

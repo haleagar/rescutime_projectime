@@ -2,32 +2,506 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title></title>
+    <title>Rescuetime Data Query for Time Reports</title>
     <script src="node_modules/jsonq/jsonQ.min.js"></script>
     <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <style type="text/css">
+        table {
+            font-family: "Helvetica", "Lucida Sans", "Lucida Sans Unicode", "Luxi Sans", Tahoma, sans-serif;
+            box-shadow: 1px 1px 10px rgba(0,0,0,0.5);
+            border-collapse: collapse;
+            border-spacing: 0;
+        }
+        table {
+            margin: auto;
+        }
+        table, td, th {
+            padding: 5px;
+            text-align: center;
+            border: 1px solid rgb(8,48,107);
+        }
+        th {
+            background-color: rgb(8,81,156);
+            color: white;
+        }
+        .col-project th {
+             font-size: 8px;
+             padding: 5px 0;
+         }
+        td.col-data {
+            display: none;
+        }
+        tr.showfull td.col-data {
+            display: initial;
+        }
+    </style>
     <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script src="http://d3js.org/d3.v3.js"></script>​
+    <script>
+        function addTable(list, appendObj) {
+            var columns = addAllColumnHeaders(list, appendObj);
+
+            for (var i = 0; i < list.length; i++) {
+                var row$ = $('<tr/>');
+                for (var colIndex = 0; colIndex < columns.length; colIndex++) {
+                    var cellValue = list[i][columns[colIndex]];
+
+                    if (cellValue == null) {
+                        cellValue = "";
+                    }
+
+                    if (cellValue.constructor === Array)
+                    {
+                        $a = $('<td/>');
+                        row$.append($a);
+                        addTable(cellValue, $a);
+                        $a.addClass('col-'+columns[colIndex]);
+
+                    } else if (cellValue.constructor === Object)
+                    {
+
+                        var array = $.map(cellValue, function (value, index) {
+                            return [value];
+                        });
+
+                        $a = $('<td/>');
+                        row$.append($a);
+                        addObject(array, $a);
+                        $a.addClass('col-'+columns[colIndex]);
+
+                    } else {
+                        if (colIndex == 0 ) {row$.addClass('row-'+cellValue);}
+
+                        var $newTD = $('<td/>').html(cellValue);
+                        row$.append($newTD);
+                        $newTD.addClass('col-'+columns[colIndex]);
+                    }
+                }
+                appendObj.append(row$);
+            }
+        }
+
+
+        function addObject(list, appendObj) {
+            for (var i = 0; i < list.length; i++) {
+                var row$ = $('<tr/>');
+
+                var cellValue = list[i];
+
+                if (cellValue == null) {
+                    cellValue = "";
+                }
+
+                if (cellValue.constructor === Array)
+                {
+                    $a = $('<td/>');
+                    row$.append($a);
+                    addTable(cellValue, $a);
+                    $a.addClass('col-'+columns[colIndex]);
+
+
+                } else if (cellValue.constructor === Object)
+                {
+
+                    var array = $.map(cellValue, function (value, index) {
+                        return [value];
+                    });
+
+                    $a = $('<td/>');
+                    row$.append($a);
+                    addObject(array, $a);
+                    $a.addClass('col-'+columns[colIndex]);
+
+                } else {
+                    var $newTD = $('<td/>').html(cellValue);
+                    row$.append($newTD);
+                    $newTD.addClass('col-');
+                }
+                appendObj.append(row$);
+            }
+        }
+
+        // Adds a header row to the table and returns the set of columns.
+        // Need to do union of keys from all records as some records may not contain
+        // all records
+        function addAllColumnHeaders(list, appendObj)
+        {
+            var columnSet = [];
+            var headerTr$ = $('<tr/>');
+
+            for (var i = 0; i < list.length; i++) {
+                var rowHash = list[i];
+                for (var key in rowHash) {
+                    if ($.inArray(key, columnSet) == -1) {
+                        columnSet.push(key);
+                        var $newTR = $('<th/>').html(key)
+                        headerTr$.append($newTR);
+                        $newTR.addClass('col-'+key);
+                    }
+                }
+            }
+            appendObj.append(headerTr$);
+
+            return columnSet;
+        }
+
+    </script>
+    <script>
+        function recurse(sel) {
+            // sel is a d3.selection of one or more empty tables
+            sel.each(function(d) {
+                // d is an array of objects
+                var colnames,
+                        tds,
+                        table = d3.select(this);
+                // obtain column names by gathering unique key names in all 1st level objects
+                // following method emulates a set by using the keys of a d3.map()
+                colnames = d                                                          // array of objects
+                        .reduce(function(p,c) { return p.concat(d3.keys(c)); }, [])       // array with all keynames
+                        .reduce(function(p,c) { return (p.set(c,0), p); }, d3.map())      // map with unique keynames as keys
+                        .keys();                                                          // array with unique keynames (arb. order)
+
+                // colnames array is in arbitrary order
+                // sort colnames here if required
+
+                // create header row using standard 1D data join and enter()
+                table.append("thead").append("tr").selectAll("th")
+                        .data(colnames)
+                        .enter().append("th")
+                        .text(function(d) { return d; });
+
+                // create the table cells by using nested 2D data join and enter()
+                // see also http://bost.ocks.org/mike/nest/
+                tds = table.append("tbody").selectAll("tr")
+                        .data(d)                            // each row gets one object
+                        .enter().append("tr").selectAll("td")
+                        .data(function(d) {                 // each cell gets one value
+                            return colnames.map(function(k) { // for each colname (i.e. key) find the corresponding value
+                                return d[k] || "";              // use empty string if key doesn't exist for that object
+                            });
+                        })
+                        .enter().append("td").classed("col-", true);
+
+                // cell contents depends on the data bound to the cell
+                // fill with text if data is not an Array
+                tds.filter(function(d) { return !(d instanceof Array); })
+                        .text(function(d) { return d; });
+                // fill with a new table if data is an Array
+                tds.filter(function(d) { return (d instanceof Array); })
+                        .append("table")
+                        .call(recurse);
+            });
+        }
+    </script>
+
     <script>
         //$( document ).ready(function() {
         $( function() {
             console.log( "ready!" );
-            $.ajax({
-                url: 'https://www.rescuetime.com/anapi/data?key=B639daNB9cIPMCFK3ulFjwliHdu5Eygc2Bw0BW8T&format=json&pv=interval&rs=minute&rb=2017-01-09&re=2017-01-09&rk=activity',
-                dataType: 'jsonp',
-                success: function(dataWeGotViaJsonp){
-                    var text = '';
-                    var len = dataWeGotViaJsonp.length;
-                    for(var i=0;i<len;i++){
-                        twitterEntry = dataWeGotViaJsonp[i];
-                        text += '<p><img src = "' + twitterEntry.user.profile_image_url_https +'"/>' + twitterEntry['text'] + '</p>'
-                    }
-                    $('#twitterFeed').html(text);
-                }
-            });
+            document.proj = {};
+            document.probablyproj = {};
+
+            document.proj['WAHV'] = $('#keywords-wahv').val().toLowerCase().trim().split("\n");
+            document.probablyproj['WAHV'] =$('#probablykeywords-wahv').val().toLowerCase().trim().split("\n");
+
+            document.proj['GREENHILL'] = $('#keywords-green').val().toLowerCase().trim().split("\n");
+            document.probablyproj['GREENHILL'] =$('#probablykeywords-green').val().toLowerCase().trim().split("\n");
+
+            document.proj['PCH'] = $('#keywords-pch').val().toLowerCase().trim().split("\n");
+            document.probablyproj['PCH'] =$('#probablykeywords-pch').val().toLowerCase().trim().split("\n");
+
+            document.proj['PGPF'] = $('#keywords-pgpf').val().toLowerCase().trim().split("\n");
+            document.probablyproj['PGPF'] =$('#probablykeywords-pgpf').val().toLowerCase().trim().split("\n");
+
+            document.proj['RESOLUTION'] = $('#keywords-res').val().toLowerCase().trim().split("\n");
+            document.probablyproj['RESOLUTION'] =$('#probablykeywords-res').val().toLowerCase().trim().split("\n");
+
+            document.proj['PERSONAL'] = $('#keywords-personal').val().toLowerCase().trim().split("\n");
+            document.probablyproj['PERSONAL'] =$('#probablykeywords-personal').val().toLowerCase().trim().split("\n");
+
+            document.proj['DOOR3'] = $('#keywords-door3').val().toLowerCase().trim().split("\n");
+            document.probablyproj['DOOR3'] =$('#probablykeywords-door3').val().toLowerCase().trim().split("\n");
+            document.jsonQobj = {};
+            document.strucData = {};
+            document.strucArray = [];
+            var day = "2017-01-09";
+            var rtAPIkey = 'B639daNB9cIPMCFK3ulFjwliHdu5Eygc2Bw0BW8T';
+            var apiURL = "https://www.rescuetime.com/anapi/data";//?callback=?
+            $.ajaxSetup({ dataType: "jsonp" });
+            $( "#datepicker" ).datepicker();
+            $( "button#load-data" ).click( function( event ) {
+                event.preventDefault();
+                $('#restructured-data-table tr').remove();
+                var currentDate = $( "#datepicker" ).datepicker( "getDate" );
+                day = $.datepicker.formatDate( "yy-mm-dd", currentDate );
+                console.log("day",day);
+                $.getJSON( apiURL, {
+                    key:rtAPIkey,
+                    rs: "minute",
+                    rb: day,
+                    re: day,
+                    pv: 'interval',
+                    rk: 'document',
+                    format: "json"
+                }).done(function( data ) {
+
+                    //console.log('data notes',data['notes']);
+                    console.log('data row_headers',data['row_headers']);
+                    //console.log('data rows',data['rows']);
+                    $.each( data.rows, function( i, row ) {
+                        //$( "<img>" ).attr( "src", item.media.m ).appendTo( "#images" );
+                        var time = row[0];
+                        var duration = row[1];
+                        var app = row[3];
+                        var title = row[4];
+                        var rowObj = {time:time,project:'UNALOCATED',duration:duration,app:app,title:title};
+                        if (document.strucData[time] == undefined) {
+                            document.strucData[time] = {timeslice:time,total:0,missing:0,project:[{UNALOCATED:0},{}],data:[]};
+
+                            document.strucArray.push(document.strucData[time]);
+                            $.each( document.proj, function( projname, keywords ) {
+                                document.strucData[time].project[0][projname] = 0;
+                                //project[1] is fixedup time
+                                if (projname != 'DOOR3') {document.strucData[time].project[1][projname] = 0;}
+                            });
+                        }
+                        document.strucData[time]['data'].push( rowObj );
+                        document.strucData[time]['total'] += duration;
+                        document.strucData[time]['missing'] = 300 - document.strucData[time]['total'];
+                        $.each( document.proj, function( projname, keywords ) {
+                            if (rowObj['project'] == 'UNALOCATED') {
+                                if (keywords.some(function (v) {
+                                            return (title).toLowerCase().indexOf(v) >= 0;
+                                        })) {
+                                    document.strucData[time].project[0][projname] += duration;
+                                    rowObj['project'] = projname;
+                                }
+                            }
+                        });
+                        $.each( document.probablyproj, function( projname, keywords ) {
+                            if (rowObj['project'] == 'UNALOCATED') {
+                                if (keywords.some(function(v) { return (title).toLowerCase().indexOf(v) >= 0; }))  {
+                                    document.strucData[time].project[0][projname]    += duration;
+                                    rowObj['project'] = projname;
+                                }
+                            }
+                        });
+                        if (rowObj['project'] == 'UNALOCATED') { document.strucData[time].project[0]['UNALOCATED']    += duration; }
+                    });
+
+                    $.each( document.strucData, function( timeslice, row ) {
+                        // fix up data, distribute missing, DOOR3, and UNALOCATED proportionaly across other projects
+                        // sum loose time
+                        // calc % of remaining time existing on other projects
+                        // divide remaing time by each proj %, floor it, add it to proj (in new obj)
+                        // check total in new obj and fill roudning error on largest proj
+
+                        $.each( document.probablyproj, function( projname, keywords ) {
+                            //project[1] is fixedup time
+                            document.strucData[timeslice].project[1][projname] = 0;
+                        });
+                    });
+
+                    $.each( document.strucData, function( timeslice, row ) {
+                        // sum proj totals
+                    });
+
+//                    d3.select("#restructured-data").selectAll("table")
+//                            .data([document.strucArray])
+//                            .enter().append("table")
+//                            .call(recurse);
+                    addTable(document.strucArray, $("#restructured-data-table"));
+
+                    $('tr').click( function( event ) {
+                        event.preventDefault();
+                        $(this).find('td.col-data').toggle();
+                    });
+                    $('th.col-data').click( function( event ) {
+                        event.preventDefault();
+                        $('td.col-data').toggle();
+                    });
+
+//                    document.jsonQobj=jsonQ(document.strucData);
+//                    document.WAHV = document.jsonQobj.find('document',function () {
+//                        return this[3].toLowerCase().indexOf('wahv') !== -1;
+//                        //return this[0].toLowerCase().includes('wahv');
+//                    });
+
+                });
+            } );
+
         });
+
     </script>
 </head>
 <body>
-test
+
+<label>Pick a day to load: </label><div id="datepicker"></div>
+<br><button id="load-data" class="ui-button ui-widget ui-corner-all">load data</button>
+<div id="restructured-data">
+    <table id="restructured-data-table" border="1"></table>
+</div>
+
+<div><h1>Projects</h1>
+
+    <div id="wahv">
+        <h2>WAHV</h2>
+        <h3><label>Keywords</label></h3>
+        <textarea title="keywords-wahv" id="keywords-wahv" rows="10" cols="50">
+wahv
+localhost:3000
+brainwahve
+jinwei
+praveen
+deepa
+jenkins
+phppgadmin
+postgres
+knex
+data:
+        </textarea>
+        <h3><label>Probably Keywords</label></h3>
+        <textarea title="probablykeywords-wahv" id="probablykeywords-wahv" rows="10" cols="50">
+chimp
+webdriver
+cucumber
+reports
+node.js
+react
+        </textarea>
+    </div>    <br>
+
+    <div id="greenhill">
+        <h2>Greenhill</h2>
+        <h3><label>Keywords</label></h3>
+        <textarea title="keywords-green" id="keywords-green" rows="10" cols="50">
+greenhill
+dunn
+808705e3-d1e0-48d6-9e92-563ba1af548e
+d8f01cef-3211-4d23-9c39-876ab642e0c0
+gs-
+amCharts
+        </textarea>
+        <h3><label>Probably Keywords</label></h3>
+        <textarea title="probablykeywords-green" id="probablykeywords-green" rows="10" cols="50">
+green
+        </textarea>
+    </div>   <br>
+
+    <div id="PCH">
+        <h2>Peterson Healthcare</h2>
+        <h3><label>Keywords</label></h3>
+        <textarea title="keywords-pch" id="keywords-pch" rows="10" cols="50">
+pch
+2ee75d82-d073-496d-a030-f1b598662082
+lance
+teegarden
+petersonhealthcare
+        </textarea>
+        <h3><label>Probably Keywords</label></h3>
+        <textarea title="probablykeywords-pch" id="probablykeywords-pch" rows="10" cols="50">
+pch
+        </textarea>
+    </div>   <br>
+
+    <div id="PGPF">
+        <h2>Greenhill</h2>
+        <h3><label>Keywords</label></h3>
+        <textarea title="keywords-pgpf" id="keywords-pgpf" rows="10" cols="50">
+pgpf
+6484fc6e-2a7a-4cef-b80a-a117593f3345
+02dce34e-3e42-4d40-9055-0b82e3ab7849
+curry
+anila
+</textarea>
+        <h3><label>Probably Keywords</label></h3>
+        <textarea title="probablykeywords-pgpf" id="probablykeywords-pgpf" rows="10" cols="50">
+ctsiokos
+costa
+tsiokos
+        </textarea>
+    </div>   <br>
+
+    <div id="RESOLUTION">
+        <h2>Resolution Project</h2>
+        <h3><label>Keywords</label></h3>
+        <textarea title="keywords-res" id="keywords-res" rows="10" cols="50">
+resolution
+resolutionproject
+linode
+george
+tsiatis
+32542c10-f441-408f-ad12-556bb7d57dd4
+        </textarea>
+        <h3><label>Probably Keywords</label></h3>
+        <textarea title="probablykeywords-res" id="probablykeywords-res" rows="10" cols="50">
+resolution
+        </textarea>
+    </div>   <br>
+
+    <div id="PERSONAL">
+        <h2>Personal Project</h2>
+        <h3><label>Keywords</label></h3>
+        <textarea title="keywords-personal" id="keywords-personal" rows="10" cols="50">
+d5d70249-ef32-4a1d-b597-2950d79d4f32
+haleagar.com
+contests
+minecraft
+scratch
+cube
+doctor
+        </textarea>
+        <h3><label>Probably Keywords</label></h3>
+        <textarea title="probablykeywords-personal" id="probablykeywords-personal" rows="10" cols="50">
+vlc
+youtube
+facebook
+maps
+        </textarea>
+    </div>   <br>
+
+    <div id="DOOR3">
+        <h2>Door3</h2>
+        <h3><label>Keywords</label></h3>
+        <textarea title="keywords-door3" id="keywords-door3" rows="10" cols="50">
+door3
+pantheon
+rescuetime
+projectorpsa
+        </textarea>
+        <h3><label>Probably Keywords</label></h3>
+        <textarea title="probablykeywords-door3" id="probablykeywords-door3" rows="10" cols="50">
+jetbrains
+phpstorm
+pantheon
+backtrac
+jira
+atlassian
+github
+sow
+estimate
+matrix
+slack
+stackoverflow
+git
+w3schools
+css
+jquery
+react
+angular
+drupal
+php
+virtualbox
+ubuntu
+firefox
+geaney
+searchmonkey
+        </textarea>
+    </div>   <br>
+
+</div><br>
+
 </body>
 </html>
+
