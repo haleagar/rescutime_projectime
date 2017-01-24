@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Rescuetime Data Query for Time Reports</title>
-    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script src="node_modules/jsonq/jsonQ.min.js"></script>
@@ -14,7 +14,19 @@
 
 
     <script>
-        //$( document ).ready(function() {
+        function str_pad_left(string,pad,length) {
+            return (new Array(length+1).join(pad)+string).slice(-length);
+        }
+        function min_hour_display (minutes, seconds) {
+            minutes = minutes || 0;
+            seconds = seconds || 0;
+            var time = (minutes*60)+seconds;
+            var hours = Math.floor(time / 3600);
+            time = time - hours * 3600;
+            minutes = Math.round(time / 60);
+            //seconds = time - minutes * 60;
+            return hours+':'+str_pad_left(minutes,'0',2); // +':'+str_pad_left(seconds,'0',2);
+        }
         $( function() {
             console.log( "ready!" );
             $('button#show-totals').click( function( event ) {
@@ -31,26 +43,26 @@
                     });
                 });
 
-                $('#totalby5-wahv').val(Math.round(projtotals.WAHV));
-                $('#totalby5-greenhill').val(Math.round(projtotals.GREENHILL));
-                $('#totalby5-pch').val(Math.round(projtotals.PCH));
-                $('#totalby5-pgpf').val(Math.round(projtotals.PGPF));
-                $('#totalby5-resolution').val(Math.round(projtotals.RESOLUTION));
-                $('#totalby5-personal').val(Math.round(projtotals.PERSONAL));
-                $('#totalby5-door3').val(Math.round(projtotals.DOOR3));
-                $('#totalby5-unallocated').val(Math.round(projtotals.UNALLOCATED));
+                $('#totalby5-wahv').val(min_hour_display(projtotals.WAHV));
+                $('#totalby5-greenhill').val(min_hour_display(projtotals.GREENHILL));
+                $('#totalby5-pch').val(min_hour_display(projtotals.PCH));
+                $('#totalby5-pgpf').val(min_hour_display(projtotals.PGPF));
+                $('#totalby5-resolution').val(min_hour_display(projtotals.RESOLUTION));
+                $('#totalby5-personal').val(min_hour_display(projtotals.PERSONAL));
+                $('#totalby5-door3').val(min_hour_display(projtotals.DOOR3));
+                $('#totalby5-unallocated').val(min_hour_display(projtotals.UNALLOCATED));
 
                 var modval = Number($('#total-mod').val());
                 console.log('modval',modval);
                 console.log('projtotals.WAHV',projtotals.WAHV);
-                $('#totalmod-wahv').val(Math.round(projtotals.WAHV*modval));
-                $('#totalmod-greenhill').val(Math.round(projtotals.GREENHILL*modval));
-                $('#totalmod-pch').val(Math.round(projtotals.PCH*modval));
-                $('#totalmod-pgpf').val(Math.round(projtotals.PGPF*modval));
-                $('#totalmod-resolution').val(Math.round(projtotals.RESOLUTION*modval));
-                $('#totalmod-personal').val(Math.round(projtotals.PERSONAL*modval));
-                $('#totalmod-door3').val(Math.round(projtotals.DOOR3*modval));
-                $('#totalmod-unallocated').val(Math.round(projtotals.UNALLOCATED*modval));
+                $('#totalmod-wahv').val(min_hour_display(projtotals.WAHV*modval));
+                $('#totalmod-greenhill').val(min_hour_display(projtotals.GREENHILL*modval));
+                $('#totalmod-pch').val(min_hour_display(projtotals.PCH*modval));
+                $('#totalmod-pgpf').val(min_hour_display(projtotals.PGPF*modval));
+                $('#totalmod-resolution').val(min_hour_display(projtotals.RESOLUTION*modval));
+                $('#totalmod-personal').val(min_hour_display(projtotals.PERSONAL*modval));
+                $('#totalmod-door3').val(min_hour_display(projtotals.DOOR3*modval));
+                $('#totalmod-unallocated').val(min_hour_display(projtotals.UNALLOCATED*modval));
 
 
 
@@ -58,60 +70,59 @@
                 $('td.col-WAHV').each(function() {
                     wahvtotal += Number($(this).html());
                 });
-                $('#total-wahv').val(Math.round(wahvtotal/60));
+                $('#total-wahv').val(min_hour_display(0,wahvtotal));
 
                 var greentotal = 0;
                 $('td.col-GREENHILL').each(function() {
                     greentotal += Number($(this).html());
                 });
-                $('#total-greenhill').val(Math.round(greentotal/60));
+                $('#total-greenhill').val(min_hour_display(0,greentotal));
 
                 var pchtotal = 0;
                 $('td.col-PCH').each(function() {
                     pchtotal += Number($(this).html());
                 });
-                $('#total-pch').val(Math.round(pchtotal/60));
+                $('#total-pch').val(min_hour_display(0,pchtotal));
 
                 var pgpftotal = 0;
                 $('td.col-PGPF').each(function() {
                     pgpftotal += Number($(this).html());
                 });
-                $('#total-pgpf').val(Math.round(pgpftotal/60));
+                $('#total-pgpf').val(min_hour_display(0,pgpftotal));
 
                 var restotal = 0;
                 $('td.col-RESOLUTION').each(function() {
                     restotal += Number($(this).html());
                 });
-                $('#total-resolution').val(Math.round(restotal/60));
+                $('#total-resolution').val(min_hour_display(0,restotal));
 
                 var persionaltotal = 0;
                 $('td.col-PERSONAL').each(function() {
                     persionaltotal += Number($(this).html());
                 });
-                $('#total-personal').val(Math.round(persionaltotal/60));
+                $('#total-personal').val(min_hour_display(0,persionaltotal));
 
                 var unallocatedtotal = 0;
                 $('td.col-UNALOCATED').each(function() {
                     unallocatedtotal += Number($(this).html());
                 });
-                $('#total-unallocated').val(Math.round(unallocatedtotal/60));
+                $('#total-unallocated').val(min_hour_display(0,unallocatedtotal));
 
                 var door3total = 0;
                 $('td.col-DOOR3').each(function() {
                     door3total += Number($(this).html());
                 });
-                $('#total-door3').val(Math.round(door3total/60));
+                $('#total-door3').val(min_hour_display(0,door3total));
 
                 var missingtotal = 0;
                 $('td.col-missing').each(function() {
                     missingtotal += Number($(this).html());
                 });
-                $('#total-missing').val(Math.round(missingtotal/60));
+                $('#total-missing').val(min_hour_display(0,missingtotal));
             });
-            $( "#tabs-data" ).tabs();
-            $( "#tabs-projects" ).tabs();
-            $( "input#tabs-data" ).checkboxradio();
-            $( "input#tabs-projects" ).checkboxradio();
+            $( ".tabs" ).tabs();
+            $( 'input[type="checkbox"]' ).checkboxradio();
+
             $( "#datepicker" ).datepicker();
 
             $('a#show-data').click( function( event ) {
@@ -135,6 +146,24 @@
                 $('th.col-project').hide();
             });
 
+            $('button#hide-proj-all').click( function( event ) {
+                $("input#checkbox-unalocated")[0].checked = false;
+                $("input#checkbox-unalocated").click()
+                $("input#checkbox-wahv")[0].checked = false;
+                $("input#checkbox-wahv").click()
+                $("input#checkbox-greenhill")[0].checked = false;
+                $("input#checkbox-greenhill").click()
+                $("input#checkbox-pch")[0].checked = false;
+                $("input#checkbox-pch").click()
+                $("input#checkbox-pgpf")[0].checked = false;
+                $("input#checkbox-pgpf").click()
+                $("input#checkbox-resolution")[0].checked = false;
+                $("input#checkbox-resolution").click()
+                $("input#checkbox-personal")[0].checked = false;
+                $("input#checkbox-personal").click()
+                $("input#checkbox-door3")[0].checked = false;
+                $("input#checkbox-door3").click()
+            });
             $("input#checkbox-unalocated").change(function() {
                 if(this.checked) {
                     $('tr.row-UNALOCATED').hide();
@@ -208,15 +237,12 @@
 todo
 <ul>
     <li>http://www.jeasyui.com/demo/main/index.php?plugin=DataGrid&theme=default&dir=ltr&pitem=</li>
-    <li>loading animation</li>
-    <li>+% calcs</li>
     <li>count/display overcounts</li>
-    <li>display hour min</li>
     <li>display day total</li>
     <li>check all option on hide rows</li>
-    <li>reset hide rows on data load</li>
     <li>structure the project form elemets and functions to avoid manual duplication</li>
     <li>save the project settings</li>
+    <li>duplicate project colum title</li>
 </ul>
 
 <label>Pick a day to load: </label><div id="datepicker"></div>
@@ -238,7 +264,7 @@ todo
 </div>
 <input class="easyui-textbox" label="First Name:" labelPosition="top" style="width:100%;height:52px">
 <div id="table-controls">
-    <div id="tabs-projects">
+    <div id="tabs-projects" class="tabs">
         <ul>
             <li><a id="show-projects" href="#tabs-3">show projects</a></li>
             <li><a id="hide-projects" href="#tabs-4">hide projects</a></li>
@@ -246,7 +272,7 @@ todo
         <div id="tabs-3"></div>
         <div id="tabs-4"></div>
     </div>
-    <div id="tabs-data">
+    <div id="tabs-data" class="tabs">
         <ul>
             <li><a id="show-data" href="#tabs-1">show detail data</a></li>
             <li><a id="hide-data" href="#tabs-2">hide detail data</a></li>
@@ -281,6 +307,7 @@ todo
             <input type="checkbox" name="checkbox-door3" id="checkbox-door3">
         </label>
     </fieldset>
+    <button id="hide-proj-all" class="ui-button ui-widget ui-corner-all">hide all projects</button>
 </div>
 <div id="restructured-data">
     <table id="restructured-data-table" border="1"></table>
@@ -304,6 +331,7 @@ phppgadmin
 postgres
 knex
 data:
+pgsql
         </textarea>
         <h3><label>Probably Keywords</label></h3>
         <textarea title="probablykeywords-wahv" id="probablykeywords-wahv" rows="5" cols="50">
@@ -329,6 +357,9 @@ dunn
 d8f01cef-3211-4d23-9c39-876ab642e0c0
 gs-
 amCharts
+GS board
+HEagar.d3.local
+Greehill
         </textarea>
         <h3><label>Probably Keywords</label></h3>
         <textarea title="probablykeywords-green" id="probablykeywords-green" rows="5" cols="50">
@@ -341,10 +372,13 @@ green
         <h3><label>Keywords</label></h3>
         <textarea title="keywords-pch" id="keywords-pch" rows="5" cols="50">
 pch
+phc-
+PHC board
 2ee75d82-d073-496d-a030-f1b598662082
 lance
 teegarden
 petersonhealthcare
+Peterson Health
         </textarea>
         <h3><label>Probably Keywords</label></h3>
         <textarea title="probablykeywords-pch" id="probablykeywords-pch" rows="5" cols="50">
@@ -399,6 +433,17 @@ scratch
 cube
 doctor
 Change.org
+tdbank
+barclaycardus
+ynab
+menshealth
+ultimaker
+formlabs
+3dsystems
+Sweepstakes
+Restating the Obvious
+Orlando
+hawaii
         </textarea>
         <h3><label>Probably Keywords</label></h3>
         <textarea title="probablykeywords-personal" id="probablykeywords-personal" rows="5" cols="50">
@@ -417,6 +462,8 @@ General Entertainment
 Maps & Regional
 youtube
 facebook
+3d print
+wdw
         </textarea>
     </div>   <br>
 
@@ -472,7 +519,7 @@ General Software Development
     </div>   <br>
 
 </div><br>
-
+<div id="loading-overlay"><div id="loading-text">loading ...</div></div>
 </body>
 </html>
 

@@ -1,6 +1,7 @@
 
 function getRescutimeData() {
 
+    $('#loading-overlay').show();
     var day = "2017-01-09";
     var rtAPIkey = 'B639daNB9cIPMCFK3ulFjwliHdu5Eygc2Bw0BW8T';
     var apiURL = "https://www.rescuetime.com/anapi/data";//?callback=?
@@ -95,6 +96,8 @@ function getRescutimeData() {
             // sum proj totals
         });
 
+
+        // after parse setup
         addTable(document.strucArray, $("#restructured-data-table"));
 
         $('tr.depth-0').click( function( event ) {
@@ -102,6 +105,50 @@ function getRescutimeData() {
             //$(this).find('td.col-data').toggle();
             $(this).toggleClass('selected');
         });
+
+            if($("input#checkbox-unalocated")[0].checked) {
+                $('tr.row-UNALOCATED').hide();
+            } else {
+                $('tr.row-UNALOCATED').show();
+            }
+            if($("input#checkbox-wahv")[0].checked) {
+                $('tr.row-WAHV').hide();
+            } else {
+                $('tr.row-WAHV').show();
+            }
+            if($("input#checkbox-greenhill")[0].checked) {
+                $('tr.row-GREENHILL').hide();
+            } else {
+                $('tr.row-GREENHILL').show();
+            }
+            if($("input#checkbox-pch")[0].checked) {
+                $('tr.row-PCH').hide();
+            } else {
+                $('tr.row-PCH').show();
+            }
+            if($("input#checkbox-pgpf")[0].checked) {
+                $('tr.row-PGPF').hide();
+            } else {
+                $('tr.row-PGPF').show();
+            }
+            if($("input#checkbox-resolution")[0].checked) {
+                $('tr.row-RESOLUTION').hide();
+            } else {
+                $('tr.row-RESOLUTION').show();
+            }
+            if($("input#checkbox-personal")[0].checked) {
+                $('tr.row-PERSONAL').hide();
+            } else {
+                $('tr.row-PERSONAL').show();
+            }
+            if($("input#checkbox-door3")[0].checked) {
+                $('tr.row-DOOR3').hide();
+            } else {
+                $('tr.row-DOOR3').show();
+            }
+
+        $('button#show-totals').click();
+        $('#loading-overlay').hide();
 
 //                    document.jsonQobj=jsonQ(document.strucData);
 //                    document.WAHV = document.jsonQobj.find('document',function () {
