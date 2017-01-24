@@ -34,6 +34,11 @@
         #tabs-data , #tabs-projects {
             width: 45%;
             float: left;
+            max-width: 340px;
+        }
+        #project-form {
+            float: none;
+            clear: both;
         }
     </style>
     <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
@@ -310,7 +315,6 @@
 <body>
 
 <label>Pick a day to load: </label><div id="datepicker"></div>
-<button id="load-data" class="ui-button ui-widget ui-corner-all">load data</button>
 <div id="tabs-data">
     <ul>
         <li><a id="hide-data" href="#tabs-1">hide detail data</a></li>
@@ -327,11 +331,12 @@
     <div id="tabs-3"></div>
     <div id="tabs-4"></div>
 </div>
+<button id="load-data" class="ui-button ui-widget ui-corner-all">load data</button>
 <div id="restructured-data">
     <table id="restructured-data-table" border="1"></table>
 </div>
 
-<div><h1>Projects</h1>
+<div id="project-form"><h1>Projects</h1>
 
     <div id="wahv">
         <h2>WAHV</h2>
