@@ -1,0 +1,55 @@
+
+table {
+    font-family: "Helvetica", "Lucida Sans", "Lucida Sans Unicode", "Luxi Sans", Tahoma, sans-serif;
+    box-shadow: 1px 1px 10px rgba(0,0,0,0.5);
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+table {
+    margin: auto;
+}
+table, td, th {
+    padding: 5px;
+    text-align: center;
+    border: 1px solid rgb(8,48,107);
+}
+th {
+    background-color: rgb(8,81,156);
+    color: white;
+}
+.col-project th {
+    font-size: 8px;
+    padding: 5px 0;
+}
+td.col-data, tr.col-data {
+    display: inherit;
+}
+#table-controls {
+    clear: both;
+}
+#tabs-data , #tabs-projects {
+    width: 45%;
+    float: left;
+    max-width: 340px;
+}
+button#load-data {
+    width: 280px;
+}
+#project-form {
+    float: none;
+    clear: both;
+}
+hr {
+    clear: both;
+    height: 3px;
+}
+div#restructured-data {
+    clear: both;
+    float: left;
+}
+tr.selected {
+    background-color: yellowgreen;
+}
+#project-toggles {
+    clear: both;
+}

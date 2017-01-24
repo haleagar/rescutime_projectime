@@ -3,193 +3,115 @@
 <head>
     <meta charset="UTF-8">
     <title>Rescuetime Data Query for Time Reports</title>
-    <script src="node_modules/jsonq/jsonQ.min.js"></script>
     <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-    <style type="text/css">
-        table {
-            font-family: "Helvetica", "Lucida Sans", "Lucida Sans Unicode", "Luxi Sans", Tahoma, sans-serif;
-            box-shadow: 1px 1px 10px rgba(0,0,0,0.5);
-            border-collapse: collapse;
-            border-spacing: 0;
-        }
-        table {
-            margin: auto;
-        }
-        table, td, th {
-            padding: 5px;
-            text-align: center;
-            border: 1px solid rgb(8,48,107);
-        }
-        th {
-            background-color: rgb(8,81,156);
-            color: white;
-        }
-        .col-project th {
-            font-size: 8px;
-            padding: 5px 0;
-        }
-        td.col-data, tr.col-data {
-            display: none;
-        }
-        #tabs-data , #tabs-projects {
-            width: 45%;
-            float: left;
-            max-width: 340px;
-        }
-        #project-form {
-            float: none;
-            clear: both;
-        }
-    </style>
     <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-    <script>
-        // thanks to https://jsfiddle.net/7og5348w/3/
-        function addTable(list, appendObj) {
-            var columns = addAllColumnHeaders(list, appendObj);
+    <script src="node_modules/jsonq/jsonQ.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <script src="addTable.js"></script>
+    <script src="projectSetup.js"></script>
+    <script src="rescutimeparser.js"></script>
 
-            for (var i = 0; i < list.length; i++) {
-                var row$ = $('<tr/>');
-                for (var colIndex = 0; colIndex < columns.length; colIndex++) {
-                    var cellValue = list[i][columns[colIndex]];
-
-                    if (cellValue == null) {
-                        cellValue = "";
-                    }
-
-                    if (cellValue.constructor === Array)
-                    {
-                        $a = $('<td/>');
-                        row$.append($a);
-                        addTable(cellValue, $a);
-                        $a.addClass('col-'+columns[colIndex]);
-
-                    } else if (cellValue.constructor === Object)
-                    {
-
-                        var array = $.map(cellValue, function (value, index) {
-                            return [value];
-                        });
-
-                        $a = $('<td/>');
-                        row$.append($a);
-                        addObject(array, $a);
-                        $a.addClass('col-'+columns[colIndex]);
-
-                    } else {
-                        if (colIndex <= 1 ) {row$.addClass('row-'+cellValue);}
-
-                        var $newTD = $('<td/>').html(cellValue);
-                        row$.append($newTD);
-                        $newTD.addClass('col-'+columns[colIndex]);
-                    }
-                }
-                appendObj.append(row$);
-            }
-        }
-
-
-        function addObject(list, appendObj) {
-            for (var i = 0; i < list.length; i++) {
-                var row$ = $('<tr/>');
-
-                var cellValue = list[i];
-
-                if (cellValue == null) {
-                    cellValue = "";
-                }
-
-                if (cellValue.constructor === Array)
-                {
-                    $a = $('<td/>');
-                    row$.append($a);
-                    addTable(cellValue, $a);
-                    $a.addClass('col-'+columns[colIndex]);
-
-
-                } else if (cellValue.constructor === Object)
-                {
-
-                    var array = $.map(cellValue, function (value, index) {
-                        return [value];
-                    });
-
-                    $a = $('<td/>');
-                    row$.append($a);
-                    addObject(array, $a);
-                    $a.addClass('col-'+columns[colIndex]);
-
-                } else {
-                    var $newTD = $('<td/>').html(cellValue);
-                    row$.append($newTD);
-                    $newTD.addClass('col-');
-                }
-                appendObj.append(row$);
-            }
-        }
-
-        // Adds a header row to the table and returns the set of columns.
-        // Need to do union of keys from all records as some records may not contain
-        // all records
-        function addAllColumnHeaders(list, appendObj)
-        {
-            var columnSet = [];
-            var headerTr$ = $('<tr/>');
-
-            for (var i = 0; i < list.length; i++) {
-                var rowHash = list[i];
-                for (var key in rowHash) {
-                    if ($.inArray(key, columnSet) == -1) {
-                        columnSet.push(key);
-                        var $newTR = $('<th/>').html(key)
-                        headerTr$.append($newTR);
-                        $newTR.addClass('col-'+key);
-                    }
-                }
-            }
-            appendObj.append(headerTr$);
-
-            return columnSet;
-        }
-
-    </script>
 
     <script>
         //$( document ).ready(function() {
         $( function() {
             console.log( "ready!" );
-            document.proj = {};
-            document.probablyproj = {};
+            $('button#show-totals').click( function( event ) {
+                var projtotals = {UNALLOCATED:0};
+                $.each( document.proj, function( projname, keywords ) {
+                    projtotals[projname] = 0
+                });
 
-            document.proj['WAHV'] = $('#keywords-wahv').val().toLowerCase().trim().split("\n");
-            document.probablyproj['WAHV'] =$('#probablykeywords-wahv').val().toLowerCase().trim().split("\n");
+                $.each( document.strucArray, function( index, row ) {
+                    $.each( row.project[0], function( projname, total ) {
+                        if (total > 150) { projtotals[projname] +=5}
+                        else if(total > 75) {projtotals[projname] +=2.5}
+                        else if(total > 30) {projtotals[projname] +=1}
+                    });
+                });
 
-            document.proj['GREENHILL'] = $('#keywords-green').val().toLowerCase().trim().split("\n");
-            document.probablyproj['GREENHILL'] =$('#probablykeywords-green').val().toLowerCase().trim().split("\n");
+                $('#totalby5-wahv').val(Math.round(projtotals.WAHV));
+                $('#totalby5-greenhill').val(Math.round(projtotals.GREENHILL));
+                $('#totalby5-pch').val(Math.round(projtotals.PCH));
+                $('#totalby5-pgpf').val(Math.round(projtotals.PGPF));
+                $('#totalby5-resolution').val(Math.round(projtotals.RESOLUTION));
+                $('#totalby5-personal').val(Math.round(projtotals.PERSONAL));
+                $('#totalby5-door3').val(Math.round(projtotals.DOOR3));
+                $('#totalby5-unallocated').val(Math.round(projtotals.UNALLOCATED));
 
-            document.proj['PCH'] = $('#keywords-pch').val().toLowerCase().trim().split("\n");
-            document.probablyproj['PCH'] =$('#probablykeywords-pch').val().toLowerCase().trim().split("\n");
+                var modval = Number($('#total-mod').val());
+                console.log('modval',modval);
+                console.log('projtotals.WAHV',projtotals.WAHV);
+                $('#totalmod-wahv').val(Math.round(projtotals.WAHV*modval));
+                $('#totalmod-greenhill').val(Math.round(projtotals.GREENHILL*modval));
+                $('#totalmod-pch').val(Math.round(projtotals.PCH*modval));
+                $('#totalmod-pgpf').val(Math.round(projtotals.PGPF*modval));
+                $('#totalmod-resolution').val(Math.round(projtotals.RESOLUTION*modval));
+                $('#totalmod-personal').val(Math.round(projtotals.PERSONAL*modval));
+                $('#totalmod-door3').val(Math.round(projtotals.DOOR3*modval));
+                $('#totalmod-unallocated').val(Math.round(projtotals.UNALLOCATED*modval));
 
-            document.proj['PGPF'] = $('#keywords-pgpf').val().toLowerCase().trim().split("\n");
-            document.probablyproj['PGPF'] =$('#probablykeywords-pgpf').val().toLowerCase().trim().split("\n");
 
-            document.proj['RESOLUTION'] = $('#keywords-res').val().toLowerCase().trim().split("\n");
-            document.probablyproj['RESOLUTION'] =$('#probablykeywords-res').val().toLowerCase().trim().split("\n");
 
-            document.proj['PERSONAL'] = $('#keywords-personal').val().toLowerCase().trim().split("\n");
-            document.probablyproj['PERSONAL'] =$('#probablykeywords-personal').val().toLowerCase().trim().split("\n");
+                var wahvtotal = 0;
+                $('td.col-WAHV').each(function() {
+                    wahvtotal += Number($(this).html());
+                });
+                $('#total-wahv').val(Math.round(wahvtotal/60));
 
-            document.proj['DOOR3'] = $('#keywords-door3').val().toLowerCase().trim().split("\n");
-            document.probablyproj['DOOR3'] =$('#probablykeywords-door3').val().toLowerCase().trim().split("\n");
-            document.jsonQobj = {};
-            document.strucData = {};
-            document.strucArray = [];
+                var greentotal = 0;
+                $('td.col-GREENHILL').each(function() {
+                    greentotal += Number($(this).html());
+                });
+                $('#total-greenhill').val(Math.round(greentotal/60));
+
+                var pchtotal = 0;
+                $('td.col-PCH').each(function() {
+                    pchtotal += Number($(this).html());
+                });
+                $('#total-pch').val(Math.round(pchtotal/60));
+
+                var pgpftotal = 0;
+                $('td.col-PGPF').each(function() {
+                    pgpftotal += Number($(this).html());
+                });
+                $('#total-pgpf').val(Math.round(pgpftotal/60));
+
+                var restotal = 0;
+                $('td.col-RESOLUTION').each(function() {
+                    restotal += Number($(this).html());
+                });
+                $('#total-resolution').val(Math.round(restotal/60));
+
+                var persionaltotal = 0;
+                $('td.col-PERSONAL').each(function() {
+                    persionaltotal += Number($(this).html());
+                });
+                $('#total-personal').val(Math.round(persionaltotal/60));
+
+                var unallocatedtotal = 0;
+                $('td.col-UNALOCATED').each(function() {
+                    unallocatedtotal += Number($(this).html());
+                });
+                $('#total-unallocated').val(Math.round(unallocatedtotal/60));
+
+                var door3total = 0;
+                $('td.col-DOOR3').each(function() {
+                    door3total += Number($(this).html());
+                });
+                $('#total-door3').val(Math.round(door3total/60));
+
+                var missingtotal = 0;
+                $('td.col-missing').each(function() {
+                    missingtotal += Number($(this).html());
+                });
+                $('#total-missing').val(Math.round(missingtotal/60));
+            });
             $( "#tabs-data" ).tabs();
             $( "#tabs-projects" ).tabs();
-            var day = "2017-01-09";
-            var rtAPIkey = 'B639daNB9cIPMCFK3ulFjwliHdu5Eygc2Bw0BW8T';
-            var apiURL = "https://www.rescuetime.com/anapi/data";//?callback=?
-            $.ajaxSetup({ dataType: "jsonp" });
+            $( "input#tabs-data" ).checkboxradio();
+            $( "input#tabs-projects" ).checkboxradio();
             $( "#datepicker" ).datepicker();
 
             $('a#show-data').click( function( event ) {
@@ -212,100 +134,70 @@
                 $('td.col-project').hide();
                 $('th.col-project').hide();
             });
+
+            $("input#checkbox-unalocated").change(function() {
+                if(this.checked) {
+                    $('tr.row-UNALOCATED').hide();
+                } else {
+                    $('tr.row-UNALOCATED').show();
+                }
+            });
+            $("input#checkbox-wahv").change(function() {
+                if(this.checked) {
+                    $('tr.row-WAHV').hide();
+                } else {
+                    $('tr.row-WAHV').show();
+                }
+            });
+            $("input#checkbox-greenhill").change(function() {
+                if(this.checked) {
+                    $('tr.row-GREENHILL').hide();
+                } else {
+                    $('tr.row-GREENHILL').show();
+                }
+            });
+            $("input#checkbox-pch").change(function() {
+                if(this.checked) {
+                    $('tr.row-PCH').hide();
+                } else {
+                    $('tr.row-PCH').show();
+                }
+            });
+            $("input#checkbox-pgpf").change(function() {
+                if(this.checked) {
+                    $('tr.row-PGPF').hide();
+                } else {
+                    $('tr.row-PGPF').show();
+                }
+            });
+            $("input#checkbox-resolution").change(function() {
+                if(this.checked) {
+                    $('tr.row-RESOLUTION').hide();
+                } else {
+                    $('tr.row-RESOLUTION').show();
+                }
+            });
+
+            $("input#checkbox-personal").change(function() {
+                if(this.checked) {
+                    $('tr.row-PERSONAL').hide();
+                } else {
+                    $('tr.row-PERSONAL').show();
+                }
+            });
+
+            $("input#checkbox-door3").change(function() {
+                if(this.checked) {
+                    $('tr.row-DOOR3').hide();
+                } else {
+                    $('tr.row-DOOR3').show();
+                }
+            });
+
+
             $( "button#load-data" ).click( function( event ) {
                 event.preventDefault();
-                $('#restructured-data-table tr').remove();
-                document.strucData = {};
-                document.strucArray = [];
-                var currentDate = $( "#datepicker" ).datepicker( "getDate" );
-                day = $.datepicker.formatDate( "yy-mm-dd", currentDate );
-                console.log("day",day);
-                $.getJSON( apiURL, {
-                    key:rtAPIkey,
-                    rs: "minute",
-                    rb: day,
-                    re: day,
-                    pv: 'interval',
-                    rk: 'document',
-                    format: "json"
-                }).done(function( data ) {
-
-                    //console.log('data notes',data['notes']);
-                    console.log('data row_headers',data['row_headers']);
-                    //console.log('data rows',data['rows']);
-                    $.each( data.rows, function( i, row ) {
-                        //$( "<img>" ).attr( "src", item.media.m ).appendTo( "#images" );
-                        var time = row[0];
-                        var duration = row[1];
-                        var app = row[3];
-                        var title = row[4];
-                        var category = row[5];
-                        var rowObj = {time:time,project:'UNALOCATED',duration:duration,category:category,app:app,title:title};
-                        if (document.strucData[time] == undefined) {
-                            document.strucData[time] = {timeslice:time,total:0,missing:0,project:[{UNALOCATED:0},{}],data:[]};
-
-                            document.strucArray.push(document.strucData[time]);
-                            $.each( document.proj, function( projname, keywords ) {
-                                document.strucData[time].project[0][projname] = 0;
-                                //project[1] is fixedup time
-                                if (projname != 'DOOR3') {document.strucData[time].project[1][projname] = 0;}
-                            });
-                        }
-                        document.strucData[time]['data'].push( rowObj );
-                        document.strucData[time]['total'] += duration;
-                        document.strucData[time]['missing'] = 300 - document.strucData[time]['total'];
-                        $.each( document.proj, function( projname, keywords ) {
-                            if (rowObj['project'] == 'UNALOCATED') {
-                                if (keywords.some(function (v) {
-                                            return (title).toLowerCase().indexOf(v) >= 0;
-                                        })) {
-                                    document.strucData[time].project[0][projname] += duration;
-                                    rowObj['project'] = projname;
-                                }
-                            }
-                        });
-                        $.each( document.probablyproj, function( projname, keywords ) {
-                            if (rowObj['project'] == 'UNALOCATED') {
-                                if (keywords.some(function(v) { return (title).toLowerCase().indexOf(v) >= 0; }))  {
-                                    document.strucData[time].project[0][projname]    += duration;
-                                    rowObj['project'] = projname;
-                                }
-                            }
-                        });
-                        if (rowObj['project'] == 'UNALOCATED') { document.strucData[time].project[0]['UNALOCATED']    += duration; }
-                    });
-
-                    $.each( document.strucData, function( timeslice, row ) {
-                        // fix up data, distribute missing, DOOR3, and UNALOCATED proportionaly across other projects
-                        // sum loose time
-                        // calc % of remaining time existing on other projects
-                        // divide remaing time by each proj %, floor it, add it to proj (in new obj)
-                        // check total in new obj and fill roudning error on largest proj
-
-                        $.each( document.probablyproj, function( projname, keywords ) {
-                            //project[1] is fixedup time
-                            document.strucData[timeslice].project[1][projname] = 0;
-                        });
-                    });
-
-                    $.each( document.strucData, function( timeslice, row ) {
-                        // sum proj totals
-                    });
-
-                    addTable(document.strucArray, $("#restructured-data-table"));
-
-                    $('tr').click( function( event ) {
-                        event.preventDefault();
-                        $(this).find('td.col-data').toggle();
-                    });
-
-//                    document.jsonQobj=jsonQ(document.strucData);
-//                    document.WAHV = document.jsonQobj.find('document',function () {
-//                        return this[3].toLowerCase().indexOf('wahv') !== -1;
-//                        //return this[0].toLowerCase().includes('wahv');
-//                    });
-
-                });
+                getRescutimeData();
             } );
 
         });
@@ -313,41 +205,100 @@
     </script>
 </head>
 <body>
+todo
+<ul>
+    <li>http://www.jeasyui.com/demo/main/index.php?plugin=DataGrid&theme=default&dir=ltr&pitem=</li>
+    <li>loading animation</li>
+    <li>+% calcs</li>
+    <li>count/display overcounts</li>
+    <li>display hour min</li>
+    <li>display day total</li>
+    <li>check all option on hide rows</li>
+    <li>reset hide rows on data load</li>
+    <li>structure the project form elemets and functions to avoid manual duplication</li>
+    <li>save the project settings</li>
+</ul>
 
 <label>Pick a day to load: </label><div id="datepicker"></div>
-<div id="tabs-data">
-    <ul>
-        <li><a id="hide-data" href="#tabs-1">hide detail data</a></li>
-        <li><a id="show-data" href="#tabs-2">show detail data</a></li>
-    </ul>
-    <div id="tabs-1"></div>
-    <div id="tabs-2"></div>
-</div>
-<div id="tabs-projects">
-    <ul>
-        <li><a id="show-projects" href="#tabs-3">show projects</a></li>
-        <li><a id="hide-projects" href="#tabs-4">hide projects</a></li>
-    </ul>
-    <div id="tabs-3"></div>
-    <div id="tabs-4"></div>
-</div>
 <button id="load-data" class="ui-button ui-widget ui-corner-all">load data</button>
+<div id="totals-display">
+    <button id="show-totals" class="ui-button ui-widget ui-corner-all">show totals</button><br>
+    <table>
+        <tr><td>wahv</td><td><input type="text" name="total-wahv" id="total-wahv" value=""></td><td><input type="text" name="totalby5-wahv" id="totalby5-wahv" value=""></td><td><input type="text" name="totalmod-wahv" id="totalmod-wahv" value=""></td></tr>
+        <tr><td>greenhill</td><td><input type="text" name="total-greenhill" id="total-greenhill" value=""></td><td><input type="text" name="totalby5-greenhill" id="totalby5-greenhill" value=""></td><td><input type="text" name="totalmod-greenhill" id="totalmod-greenhill" value=""></td></tr>
+        <tr><td>pch</td><td><input type="text" name="total-pch" id="total-pch" value=""></td><td><input type="text" name="totalby5-pch" id="totalby5-pch" value=""></td><td><input type="text" name="totalmod-pch" id="totalmod-pch" value=""></td></tr>
+        <tr><td>pgpf</td><td><input type="text" name="total-pgpf" id="total-pgpf" value=""></td><td><input type="text" name="totalby5-pgpf" id="totalby5-pgpf" value=""></td><td><input type="text" name="totalmod-pgpf" id="totalmod-pgpf" value=""></td></tr>
+        <tr><td>resolution</td><td><input type="text" name="total-resolution" id="total-resolution" value=""></td><td><input type="text" name="totalby5-resolution" id="totalby5-resolution" value=""></td><td><input type="text" name="totalmod-resolution" id="totalmod-resolution" value=""></td></tr>
+        <tr><td>personal</td><td><input type="text" name="total-personal" id="total-personal" value=""></td><td><input type="text" name="totalby5-personal" id="totalby5-personal" value=""></td><td><input type="text" name="totalmod-personal" id="totalmod-personal" value=""></td></tr>
+        <tr><td>door3</td><td><input type="text" name="total-door3" id="total-door3" value=""></td><td><input type="text" name="totalby5-door3" id="totalby5-door3" value=""></td><td><input type="text" name="totalmod-door3" id="totalmod-door3" value=""></td></tr>
+        <tr><td>unalocated</td><td><input type="text" name="total-unallocated" id="total-unallocated" value=""></td><td><input type="text" name="totalby5-unallocated" id="totalby5-unallocated" value=""></td><td><input type="text" name="totalmod-unallocated" id="totalmod-unallocated" value=""></td></tr>
+        <tr><td>missing</td><td><input type="text" name="total-missing" id="total-missing" value=""></td></tr>
+    </table>
+    <input type="text" name="total-mod" id="total-mod" value="1.25">
+</div>
+<input class="easyui-textbox" label="First Name:" labelPosition="top" style="width:100%;height:52px">
+<div id="table-controls">
+    <div id="tabs-projects">
+        <ul>
+            <li><a id="show-projects" href="#tabs-3">show projects</a></li>
+            <li><a id="hide-projects" href="#tabs-4">hide projects</a></li>
+        </ul>
+        <div id="tabs-3"></div>
+        <div id="tabs-4"></div>
+    </div>
+    <div id="tabs-data">
+        <ul>
+            <li><a id="show-data" href="#tabs-1">show detail data</a></li>
+            <li><a id="hide-data" href="#tabs-2">hide detail data</a></li>
+        </ul>
+        <div id="tabs-1"></div>
+        <div id="tabs-2"></div>
+    </div>
+    <fieldset id="project-toggles">
+        <legend>Hide data row for projects: </legend>
+        <label for="checkbox-unalocated">UNALOCATED
+            <input type="checkbox" name="checkbox-unalocated" id="checkbox-unalocated">
+        </label>
+        <label for="checkbox-wahv">WAHV
+            <input type="checkbox" name="checkbox-wahv" id="checkbox-wahv">
+        </label>
+        <label for="checkbox-greenhill">Greenhill
+            <input type="checkbox" name="checkbox-Greenhill" id="checkbox-greenhill">
+        </label>
+        <label for="checkbox-pch">PCH
+            <input type="checkbox" name="checkbox-pch" id="checkbox-pch">
+        </label>
+        <label for="checkbox-pgpf">PGPF
+            <input type="checkbox" name="checkbox-pgpf" id="checkbox-pgpf">
+        </label>
+        <label for="checkbox-resolution">Resolution
+            <input type="checkbox" name="checkbox-resolution" id="checkbox-resolution">
+        </label>
+        <label for="checkbox-personal">Personal
+            <input type="checkbox" name="checkbox-personal" id="checkbox-personal">
+        </label>
+        <label for="checkbox-door3">Door3
+            <input type="checkbox" name="checkbox-door3" id="checkbox-door3">
+        </label>
+    </fieldset>
+</div>
 <div id="restructured-data">
     <table id="restructured-data-table" border="1"></table>
 </div>
-
+<hr/>
 <div id="project-form"><h1>Projects</h1>
 
     <div id="wahv">
         <h2>WAHV</h2>
         <h3><label>Keywords</label></h3>
-        <textarea title="keywords-wahv" id="keywords-wahv" rows="10" cols="50">
+        <textarea title="keywords-wahv" id="keywords-wahv" rows="5" cols="50">
 wahv
 localhost:3000
 brainwahve
 jinwei
 praveen
 deepa
+Elisei
 jenkins
 phppgadmin
 postgres
@@ -355,20 +306,23 @@ knex
 data:
         </textarea>
         <h3><label>Probably Keywords</label></h3>
-        <textarea title="probablykeywords-wahv" id="probablykeywords-wahv" rows="10" cols="50">
+        <textarea title="probablykeywords-wahv" id="probablykeywords-wahv" rows="5" cols="50">
 chimp
 webdriver
 cucumber
 reports
 node.js
 react
+mailinator
+nodejs
+npm
         </textarea>
     </div>    <br>
 
     <div id="greenhill">
         <h2>Greenhill</h2>
         <h3><label>Keywords</label></h3>
-        <textarea title="keywords-green" id="keywords-green" rows="10" cols="50">
+        <textarea title="keywords-green" id="keywords-green" rows="5" cols="50">
 greenhill
 dunn
 808705e3-d1e0-48d6-9e92-563ba1af548e
@@ -377,7 +331,7 @@ gs-
 amCharts
         </textarea>
         <h3><label>Probably Keywords</label></h3>
-        <textarea title="probablykeywords-green" id="probablykeywords-green" rows="10" cols="50">
+        <textarea title="probablykeywords-green" id="probablykeywords-green" rows="5" cols="50">
 green
         </textarea>
     </div>   <br>
@@ -385,7 +339,7 @@ green
     <div id="PCH">
         <h2>Peterson Healthcare</h2>
         <h3><label>Keywords</label></h3>
-        <textarea title="keywords-pch" id="keywords-pch" rows="10" cols="50">
+        <textarea title="keywords-pch" id="keywords-pch" rows="5" cols="50">
 pch
 2ee75d82-d073-496d-a030-f1b598662082
 lance
@@ -393,7 +347,7 @@ teegarden
 petersonhealthcare
         </textarea>
         <h3><label>Probably Keywords</label></h3>
-        <textarea title="probablykeywords-pch" id="probablykeywords-pch" rows="10" cols="50">
+        <textarea title="probablykeywords-pch" id="probablykeywords-pch" rows="5" cols="50">
 pch
         </textarea>
     </div>   <br>
@@ -401,7 +355,7 @@ pch
     <div id="PGPF">
         <h2>Greenhill</h2>
         <h3><label>Keywords</label></h3>
-        <textarea title="keywords-pgpf" id="keywords-pgpf" rows="10" cols="50">
+        <textarea title="keywords-pgpf" id="keywords-pgpf" rows="5" cols="50">
 pgpf
 6484fc6e-2a7a-4cef-b80a-a117593f3345
 02dce34e-3e42-4d40-9055-0b82e3ab7849
@@ -409,7 +363,7 @@ curry
 anila
 </textarea>
         <h3><label>Probably Keywords</label></h3>
-        <textarea title="probablykeywords-pgpf" id="probablykeywords-pgpf" rows="10" cols="50">
+        <textarea title="probablykeywords-pgpf" id="probablykeywords-pgpf" rows="5" cols="50">
 ctsiokos
 costa
 tsiokos
@@ -419,7 +373,7 @@ tsiokos
     <div id="RESOLUTION">
         <h2>Resolution Project</h2>
         <h3><label>Keywords</label></h3>
-        <textarea title="keywords-res" id="keywords-res" rows="10" cols="50">
+        <textarea title="keywords-res" id="keywords-res" rows="5" cols="50">
 resolution
 resolutionproject
 linode
@@ -428,7 +382,7 @@ tsiatis
 32542c10-f441-408f-ad12-556bb7d57dd4
         </textarea>
         <h3><label>Probably Keywords</label></h3>
-        <textarea title="probablykeywords-res" id="probablykeywords-res" rows="10" cols="50">
+        <textarea title="probablykeywords-res" id="probablykeywords-res" rows="5" cols="50">
 resolution
         </textarea>
     </div>   <br>
@@ -436,7 +390,7 @@ resolution
     <div id="PERSONAL">
         <h2>Personal Project</h2>
         <h3><label>Keywords</label></h3>
-        <textarea title="keywords-personal" id="keywords-personal" rows="10" cols="50">
+        <textarea title="keywords-personal" id="keywords-personal" rows="5" cols="50">
 d5d70249-ef32-4a1d-b597-2950d79d4f32
 haleagar.com
 contests
@@ -444,35 +398,39 @@ minecraft
 scratch
 cube
 doctor
+Change.org
         </textarea>
         <h3><label>Probably Keywords</label></h3>
-        <textarea title="probablykeywords-personal" id="probablykeywords-personal" rows="10" cols="50">
+        <textarea title="probablykeywords-personal" id="probablykeywords-personal" rows="5" cols="50">
 vlc
 youtube
 facebook
+Hal Eagar Theatrical Solutions
         </textarea>
 
-        <h3><label>Probably Keywords</label></h3>
-        <textarea title="categorykeywords-personal" id="categorykeywords-personal" rows="10" cols="50">
+        <h3><label>category Keywords</label></h3>
+        <textarea title="categorykeywords-personal" id="categorykeywords-personal" rows="5" cols="50">
 General Shopping
 General News & Opinion
 Kids Use
 General Entertainment
 Maps & Regional
+youtube
+facebook
         </textarea>
     </div>   <br>
 
     <div id="DOOR3">
         <h2>Door3</h2>
         <h3><label>Keywords</label></h3>
-        <textarea title="keywords-door3" id="keywords-door3" rows="10" cols="50">
+        <textarea title="keywords-door3" id="keywords-door3" rows="5" cols="50">
 door3
 pantheon
 rescuetime
 projectorpsa
         </textarea>
         <h3><label>Probably Keywords</label></h3>
-        <textarea title="probablykeywords-door3" id="probablykeywords-door3" rows="10" cols="50">
+        <textarea title="probablykeywords-door3" id="probablykeywords-door3" rows="5" cols="50">
 jetbrains
 phpstorm
 pantheon
@@ -486,6 +444,7 @@ matrix
 slack
 stackoverflow
 git
+Commit
 w3schools
 css
 jquery
@@ -498,6 +457,17 @@ ubuntu
 firefox
 geaney
 searchmonkey
+localhost
+Open Project
+Open File
+New File
+JavaScript
+Find in Path
+Tip of the Day
+        </textarea>
+        <h3><label>category Keywords</label></h3>
+        <textarea title="categorykeywords-door3" id="categorykeywords-door3" rows="5" cols="50">
+General Software Development
         </textarea>
     </div>   <br>
 
