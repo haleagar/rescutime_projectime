@@ -14,6 +14,22 @@
 
 
     <script>
+        function convertTime (rescutimesamp) {
+            var hours   = parseInt(rescutimesamp.substring(12, 14), 10),
+                    minutes = parseInt(rescutimesamp.substring(14, 16), 10),
+                    ampm    = 'am';
+
+            if (hours == 12) {
+                ampm = 'pm';
+            } else if (hours == 0) {
+                hours = 12;
+            } else if (hours > 12) {
+                hours -= 12;
+                ampm = 'pm';
+            }
+
+            return hours + ':' + str_pad_left(minutes,'0',2) + ' ' + ampm;
+        }
         function str_pad_left(string,pad,length) {
             return (new Array(length+1).join(pad)+string).slice(-length);
         }

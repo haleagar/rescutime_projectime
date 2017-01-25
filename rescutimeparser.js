@@ -27,7 +27,7 @@ function getRescutimeData() {
         //console.log('data rows',data['rows']);
         $.each( data.rows, function( i, row ) {
             //$( "<img>" ).attr( "src", item.media.m ).appendTo( "#images" );
-            var time = row[0];
+            var time = convertTime (row[0]);
             var duration = row[1];
             var app = row[3];
             var title = row[4];
