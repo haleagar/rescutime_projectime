@@ -65,12 +65,13 @@
                 $('#totalby5-pgpf').val(min_hour_display(projtotals.PGPF));
                 $('#totalby5-resolution').val(min_hour_display(projtotals.RESOLUTION));
                 $('#totalby5-personal').val(min_hour_display(projtotals.PERSONAL));
-                $('#totalby5-door3').val(min_hour_display(projtotals.DOOR3));
+                $('#totalby5-door3').val(min_hour_display(projtotals.PERSONAL));
                 $('#totalby5-unallocated').val(min_hour_display(projtotals.UNALLOCATED));
 
+                var by5total = projtotals.WAHV+projtotals.GREENHILL+projtotals.PCH+projtotals.PGPF+projtotals.RESOLUTION+projtotals.PERSONAL+projtotals.PERSONAL+projtotals.UNALLOCATED;
+                $('#totalby5-total').val(min_hour_display(by5total));
+
                 var modval = Number($('#total-mod').val());
-                console.log('modval',modval);
-                console.log('projtotals.WAHV',projtotals.WAHV);
                 $('#totalmod-wahv').val(min_hour_display(projtotals.WAHV*modval));
                 $('#totalmod-greenhill').val(min_hour_display(projtotals.GREENHILL*modval));
                 $('#totalmod-pch').val(min_hour_display(projtotals.PCH*modval));
@@ -78,8 +79,9 @@
                 $('#totalmod-resolution').val(min_hour_display(projtotals.RESOLUTION*modval));
                 $('#totalmod-personal').val(min_hour_display(projtotals.PERSONAL*modval));
                 $('#totalmod-door3').val(min_hour_display(projtotals.DOOR3*modval));
-                $('#totalmod-unallocated').val(min_hour_display(projtotals.UNALLOCATED*modval));
 
+                var modtotal = projtotals.WAHV+projtotals.GREENHILL+projtotals.PCH+projtotals.PGPF+projtotals.RESOLUTION+projtotals.PERSONAL+projtotals.PERSONAL;
+                $('#totalmod-total').val(min_hour_display(modtotal*modval));
 
 
                 var wahvtotal = 0;
@@ -119,7 +121,7 @@
                 $('#total-personal').val(min_hour_display(0,persionaltotal));
 
                 var unallocatedtotal = 0;
-                $('td.col-UNALOCATED').each(function() {
+                $('td.col-UNALLOCATED').each(function() {
                     unallocatedtotal += Number($(this).html());
                 });
                 $('#total-unallocated').val(min_hour_display(0,unallocatedtotal));
@@ -135,6 +137,16 @@
                     missingtotal += Number($(this).html());
                 });
                 $('#total-missing').val(min_hour_display(0,missingtotal));
+
+
+                var overcounttotal = 0;
+                $('td.col-overcount').each(function() {
+                    overcounttotal += Number($(this).html());
+                });
+                $('#total-overcount').val(min_hour_display(0,overcounttotal));
+
+                var sectotal = wahvtotal+greentotal+pchtotal+pgpftotal+restotal+persionaltotal+unallocatedtotal+door3total;
+                $('#total-total').val(min_hour_display(0,sectotal));
             });
             $( ".tabs" ).tabs();
             $( 'input[type="checkbox"]' ).checkboxradio();
@@ -163,8 +175,8 @@
             });
 
             $('button#hide-proj-all').click( function( event ) {
-                $("input#checkbox-unalocated")[0].checked = false;
-                $("input#checkbox-unalocated").click()
+                $("input#checkbox-unallocated")[0].checked = false;
+                $("input#checkbox-unallocated").click()
                 $("input#checkbox-wahv")[0].checked = false;
                 $("input#checkbox-wahv").click()
                 $("input#checkbox-greenhill")[0].checked = false;
@@ -180,11 +192,11 @@
                 $("input#checkbox-door3")[0].checked = false;
                 $("input#checkbox-door3").click()
             });
-            $("input#checkbox-unalocated").change(function() {
+            $("input#checkbox-unallocated").change(function() {
                 if(this.checked) {
-                    $('tr.row-UNALOCATED').hide();
+                    $('tr.row-UNALLOCATED').hide();
                 } else {
-                    $('tr.row-UNALOCATED').show();
+                    $('tr.row-UNALLOCATED').show();
                 }
             });
             $("input#checkbox-wahv").change(function() {
@@ -253,12 +265,10 @@
 todo
 <ul>
     <li>http://www.jeasyui.com/demo/main/index.php?plugin=DataGrid&theme=default&dir=ltr&pitem=</li>
-    <li>count/display overcounts</li>
-    <li>display day total</li>
-    <li>check all option on hide rows</li>
     <li>structure the project form elemets and functions to avoid manual duplication</li>
     <li>save the project settings</li>
-    <li>duplicate project colum title</li>
+    <li>duplicate project columb title</li>
+    <li>remember data/project hide show on load</li>
 </ul>
 
 <label>Pick a day to load: </label><div id="datepicker"></div>
@@ -273,8 +283,12 @@ todo
         <tr><td>resolution</td><td><input type="text" name="total-resolution" id="total-resolution" value=""></td><td><input type="text" name="totalby5-resolution" id="totalby5-resolution" value=""></td><td><input type="text" name="totalmod-resolution" id="totalmod-resolution" value=""></td></tr>
         <tr><td>personal</td><td><input type="text" name="total-personal" id="total-personal" value=""></td><td><input type="text" name="totalby5-personal" id="totalby5-personal" value=""></td><td><input type="text" name="totalmod-personal" id="totalmod-personal" value=""></td></tr>
         <tr><td>door3</td><td><input type="text" name="total-door3" id="total-door3" value=""></td><td><input type="text" name="totalby5-door3" id="totalby5-door3" value=""></td><td><input type="text" name="totalmod-door3" id="totalmod-door3" value=""></td></tr>
-        <tr><td>unalocated</td><td><input type="text" name="total-unallocated" id="total-unallocated" value=""></td><td><input type="text" name="totalby5-unallocated" id="totalby5-unallocated" value=""></td><td><input type="text" name="totalmod-unallocated" id="totalmod-unallocated" value=""></td></tr>
-        <tr><td>missing</td><td><input type="text" name="total-missing" id="total-missing" value=""></td></tr>
+        <tr><td>unallocated</td><td><input type="text" name="total-unallocated" id="total-unallocated" value=""></td><td><input type="text" name="totalby5-unallocated" id="totalby5-unallocated" value=""></td><td>&nbsp;</td></tr>
+        <tr><td>missing</td><td><input type="text" name="total-missing" id="total-missing" value=""></td><td>&nbsp;</td><td>&nbsp;</td></tr>
+        <tr><td>overcount</td><td><input type="text" name="total-overcount" id="total-overcount" value=""></td><td>&nbsp;</td><td>&nbsp;</td></tr>
+        <tr><td>---</td><td>---</td><td>ignores missing/overcount</td><td>and ignore unallocated</td></tr>
+        <tr><td>total</td><td><input type="text" name="total-total" id="total-total" value=""></td><td><input type="text" name="totalby5-total" id="totalby5-total" value=""></td><td><input type="text" name="totalmod-total" id="totalmod-total" value=""></td></tr>
+
     </table>
     <input type="text" name="total-mod" id="total-mod" value="1.25">
 </div>
@@ -298,8 +312,8 @@ todo
     </div>
     <fieldset id="project-toggles">
         <legend>Hide data row for projects: </legend>
-        <label for="checkbox-unalocated">UNALOCATED
-            <input type="checkbox" name="checkbox-unalocated" id="checkbox-unalocated">
+        <label for="checkbox-unallocated">UNALLOCATED
+            <input type="checkbox" name="checkbox-unallocated" id="checkbox-unallocated">
         </label>
         <label for="checkbox-wahv">WAHV
             <input type="checkbox" name="checkbox-wahv" id="checkbox-wahv">
@@ -348,6 +362,7 @@ postgres
 knex
 data:
 pgsql
+bdd
         </textarea>
         <h3><label>Probably Keywords</label></h3>
         <textarea title="probablykeywords-wahv" id="probablykeywords-wahv" rows="5" cols="50">
@@ -356,10 +371,14 @@ webdriver
 cucumber
 reports
 node.js
+node
 react
 mailinator
 nodejs
 npm
+github
+Zeplin
+jira
         </textarea>
     </div>    <br>
 
@@ -398,7 +417,8 @@ Peterson Health
         </textarea>
         <h3><label>Probably Keywords</label></h3>
         <textarea title="probablykeywords-pch" id="probablykeywords-pch" rows="5" cols="50">
-pch
+Peterson Center
+Healthcare
         </textarea>
     </div>   <br>
 
@@ -411,6 +431,9 @@ pgpf
 02dce34e-3e42-4d40-9055-0b82e3ab7849
 curry
 anila
+Peter G. Peterson Foundation
+Interactive Quiz
+fiscalship
 </textarea>
         <h3><label>Probably Keywords</label></h3>
         <textarea title="probablykeywords-pgpf" id="probablykeywords-pgpf" rows="5" cols="50">
@@ -434,6 +457,8 @@ tsiatis
         <h3><label>Probably Keywords</label></h3>
         <textarea title="probablykeywords-res" id="probablykeywords-res" rows="5" cols="50">
 resolution
+resolu
+GreatNonprofits
         </textarea>
     </div>   <br>
 
@@ -447,6 +472,7 @@ contests
 minecraft
 scratch
 cube
+Cubify
 doctor
 Change.org
 tdbank
@@ -458,8 +484,22 @@ formlabs
 3dsystems
 Sweepstakes
 Restating the Obvious
+restatingtheobviousmaui
 Orlando
 hawaii
+BBC
+PS84
+NEST
+Special-Needs
+Kids
+Progressive
+pandora
+disney
+netflix
+Salon
+Trump
+Science
+Respondent.io
         </textarea>
         <h3><label>Probably Keywords</label></h3>
         <textarea title="probablykeywords-personal" id="probablykeywords-personal" rows="5" cols="50">
@@ -467,6 +507,8 @@ vlc
 youtube
 facebook
 Hal Eagar Theatrical Solutions
+3d print
+wdw
         </textarea>
 
         <h3><label>category Keywords</label></h3>
@@ -476,10 +518,6 @@ General News & Opinion
 Kids Use
 General Entertainment
 Maps & Regional
-youtube
-facebook
-3d print
-wdw
         </textarea>
     </div>   <br>
 
@@ -489,8 +527,14 @@ wdw
         <textarea title="keywords-door3" id="keywords-door3" rows="5" cols="50">
 door3
 pantheon
-rescuetime
+rescutime
+RescueTime
 projectorpsa
+mysql
+coty
+assembla
+nautilus
+ointernal
         </textarea>
         <h3><label>Probably Keywords</label></h3>
         <textarea title="probablykeywords-door3" id="probablykeywords-door3" rows="5" cols="50">
@@ -501,6 +545,7 @@ backtrac
 jira
 atlassian
 github
+Zeplin
 sow
 estimate
 matrix
@@ -527,6 +572,15 @@ New File
 JavaScript
 Find in Path
 Tip of the Day
+Screenshots
+Redesign
+Deliverable
+UX
+Virtual Machine
+MintCinnamon
+ubuntu
+grepWin
+Code
         </textarea>
         <h3><label>category Keywords</label></h3>
         <textarea title="categorykeywords-door3" id="categorykeywords-door3" rows="5" cols="50">

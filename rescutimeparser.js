@@ -32,9 +32,9 @@ function getRescutimeData() {
             var app = row[3];
             var title = row[4];
             var category = row[5];
-            var rowObj = {time:time,project:'UNALOCATED',duration:duration,category:category,app:app,title:title};
+            var rowObj = {time:time,project:'UNALLOCATED',duration:duration,category:category,app:app,title:title};
             if (document.strucData[time] == undefined) {
-                document.strucData[time] = {timeslice:time,total:0,missing:0,project:[{UNALOCATED:0}],data:[]};
+                document.strucData[time] = {timeslice:time,total:0,missing:0,overcount:0,project:[{UNALLOCATED:0}],data:[]};
 
                 document.strucArray.push(document.strucData[time]);
                 $.each( document.proj, function( projname, keywords ) {
@@ -45,9 +45,14 @@ function getRescutimeData() {
             }
             document.strucData[time]['data'].push( rowObj );
             document.strucData[time]['total'] += duration;
-            document.strucData[time]['missing'] = 300 - document.strucData[time]['total'];
+            if (document.strucData[time]['total'] <=300) {
+                document.strucData[time]['missing'] = 300 - document.strucData[time]['total'];
+            } else {
+                document.strucData[time]['missing'] = 0;
+                document.strucData[time]['overcount'] = document.strucData[time]['total'] - 300;
+            }
             $.each( document.proj, function( projname, keywords ) {
-                if (rowObj['project'] == 'UNALOCATED') {
+                if (rowObj['project'] == 'UNALLOCATED') {
                     if (title.toLowerCase().trim() == 'no details') { title = app; }
                     if (title.toLowerCase().indexOf('New Tab') >= 0) { title = app; }
                     if (keywords.some(function (v) {
@@ -61,7 +66,7 @@ function getRescutimeData() {
             $.each( document.probablyproj, function( projname, keywords ) {
                 if (title.toLowerCase().trim() == 'no details') { title = app; }
                 if (title.toLowerCase().indexOf('New Tab') >= 0) { title = app; }
-                if (rowObj['project'] == 'UNALOCATED') {
+                if (rowObj['project'] == 'UNALLOCATED') {
                     if (keywords.some(function(v) { return (title).toLowerCase().indexOf(v) >= 0; }))  {
                         document.strucData[time].project[0][projname]    += duration;
                         rowObj['project'] = projname;
@@ -69,18 +74,18 @@ function getRescutimeData() {
                 }
             });
             $.each( document.categoryproj, function( projname, keywords ) {
-                if (rowObj['project'] == 'UNALOCATED') {
+                if (rowObj['project'] == 'UNALLOCATED') {
                     if (keywords.some(function(v) { return (category).toLowerCase().indexOf(v) >= 0; }))  {
                         document.strucData[time].project[0][projname]    += duration;
                         rowObj['project'] = projname;
                     }
                 }
             });
-            if (rowObj['project'] == 'UNALOCATED') { document.strucData[time].project[0]['UNALOCATED']    += duration; }
+            if (rowObj['project'] == 'UNALLOCATED') { document.strucData[time].project[0]['UNALLOCATED']    += duration; }
         });
 
         $.each( document.strucData, function( timeslice, row ) {
-            // fix up data, distribute missing, DOOR3, and UNALOCATED proportionaly across other projects
+            // fix up data, distribute missing, DOOR3, and UNALLOCATED proportionaly across other projects
             // sum loose time
             // calc % of remaining time existing on other projects
             // divide remaing time by each proj %, floor it, add it to proj (in new obj)
@@ -106,10 +111,10 @@ function getRescutimeData() {
             $(this).toggleClass('selected');
         });
 
-            if($("input#checkbox-unalocated")[0].checked) {
-                $('tr.row-UNALOCATED').hide();
+            if($("input#checkbox-unallocated")[0].checked) {
+                $('tr.row-UNALLOCATED').hide();
             } else {
-                $('tr.row-UNALOCATED').show();
+                $('tr.row-UNALLOCATED').show();
             }
             if($("input#checkbox-wahv")[0].checked) {
                 $('tr.row-WAHV').hide();
