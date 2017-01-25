@@ -68,10 +68,12 @@
                 $('#totalby5-door3').val(min_hour_display(projtotals.PERSONAL));
                 $('#totalby5-unallocated').val(min_hour_display(projtotals.UNALLOCATED));
 
-                var by5total = projtotals.WAHV+projtotals.GREENHILL+projtotals.PCH+projtotals.PGPF+projtotals.RESOLUTION+projtotals.PERSONAL+projtotals.PERSONAL+projtotals.UNALLOCATED;
+                var by5total = projtotals.WAHV+projtotals.GREENHILL+projtotals.PCH+projtotals.PGPF+projtotals.RESOLUTION+projtotals.PERSONAL+projtotals.UNALLOCATED+projtotals.DOOR3;
                 $('#totalby5-total').val(min_hour_display(by5total));
+                $('#totalby5-work').val(min_hour_display(by5total-projtotals.PERSONAL));
 
                 var modval = Number($('#total-mod').val());
+
                 $('#totalmod-wahv').val(min_hour_display(projtotals.WAHV*modval));
                 $('#totalmod-greenhill').val(min_hour_display(projtotals.GREENHILL*modval));
                 $('#totalmod-pch').val(min_hour_display(projtotals.PCH*modval));
@@ -80,8 +82,13 @@
                 $('#totalmod-personal').val(min_hour_display(projtotals.PERSONAL*modval));
                 $('#totalmod-door3').val(min_hour_display(projtotals.DOOR3*modval));
 
-                var modtotal = projtotals.WAHV+projtotals.GREENHILL+projtotals.PCH+projtotals.PGPF+projtotals.RESOLUTION+projtotals.PERSONAL+projtotals.PERSONAL;
+                var modtotal = projtotals.WAHV+projtotals.GREENHILL+projtotals.PCH+projtotals.PGPF+projtotals.RESOLUTION+projtotals.PERSONAL+projtotals.DOOR3;
                 $('#totalmod-total').val(min_hour_display(modtotal*modval));
+                $('#totalautomod-total').val(min_hour_display((modtotal-projtotals.DOOR3)*modval));
+                $('#totalmod-work').val(min_hour_display((modtotal-projtotals.PERSONAL)*modval));
+                $('#totalautomod-work').val(min_hour_display((modtotal-projtotals.PERSONAL-projtotals.DOOR3)*modval));
+               automodval = by5total/(by5total-(projtotals.DOOR3+projtotals.UNALLOCATED));
+                $('#total-automod').val(automodval.toFixed(2));
 
 
                 var wahvtotal = 0;
@@ -147,6 +154,7 @@
 
                 var sectotal = wahvtotal+greentotal+pchtotal+pgpftotal+restotal+persionaltotal+unallocatedtotal+door3total;
                 $('#total-total').val(min_hour_display(0,sectotal));
+                $('#total-work').val(min_hour_display(0,sectotal-persionaltotal));
             });
             $( ".tabs" ).tabs();
             $( 'input[type="checkbox"]' ).checkboxradio();
@@ -269,6 +277,14 @@ todo
     <li>save the project settings</li>
     <li>duplicate project columb title</li>
     <li>remember data/project hide show on load</li>
+    <li>next previous day option</li>
+    <li>integrate with https://www.rescuetime.com/searches</li>
+    <ul>
+        <li>should be able to make links to filtered reports just like that page</li>
+        <li>it might be possible to scrape that page if on were logged in, in order to store the keyword lists there in that page itself?</li>
+    </ul>
+
+
 </ul>
 
 <label>Pick a day to load: </label><div id="datepicker"></div>
@@ -276,23 +292,25 @@ todo
 <div id="totals-display">
     <button id="show-totals" class="ui-button ui-widget ui-corner-all">show totals</button><br>
     <table>
-        <tr><td>wahv</td><td><input type="text" name="total-wahv" id="total-wahv" value=""></td><td><input type="text" name="totalby5-wahv" id="totalby5-wahv" value=""></td><td><input type="text" name="totalmod-wahv" id="totalmod-wahv" value=""></td></tr>
+        <tr><th>project</th><th>raw seconds</th><th>clock time</th><th>fix <input type="text" name="total-mod" id="total-mod" value="1.25"></th><th>suggest <input type="text" name="total-automod" id="total-automod" value="1.25"></th></tr>
         <tr><td>greenhill</td><td><input type="text" name="total-greenhill" id="total-greenhill" value=""></td><td><input type="text" name="totalby5-greenhill" id="totalby5-greenhill" value=""></td><td><input type="text" name="totalmod-greenhill" id="totalmod-greenhill" value=""></td></tr>
         <tr><td>pch</td><td><input type="text" name="total-pch" id="total-pch" value=""></td><td><input type="text" name="totalby5-pch" id="totalby5-pch" value=""></td><td><input type="text" name="totalmod-pch" id="totalmod-pch" value=""></td></tr>
         <tr><td>pgpf</td><td><input type="text" name="total-pgpf" id="total-pgpf" value=""></td><td><input type="text" name="totalby5-pgpf" id="totalby5-pgpf" value=""></td><td><input type="text" name="totalmod-pgpf" id="totalmod-pgpf" value=""></td></tr>
+        <tr><td>wahv</td><td><input type="text" name="total-wahv" id="total-wahv" value=""></td><td><input type="text" name="totalby5-wahv" id="totalby5-wahv" value=""></td><td><input type="text" name="totalmod-wahv" id="totalmod-wahv" value=""></td></tr>
         <tr><td>resolution</td><td><input type="text" name="total-resolution" id="total-resolution" value=""></td><td><input type="text" name="totalby5-resolution" id="totalby5-resolution" value=""></td><td><input type="text" name="totalmod-resolution" id="totalmod-resolution" value=""></td></tr>
         <tr><td>personal</td><td><input type="text" name="total-personal" id="total-personal" value=""></td><td><input type="text" name="totalby5-personal" id="totalby5-personal" value=""></td><td><input type="text" name="totalmod-personal" id="totalmod-personal" value=""></td></tr>
         <tr><td>door3</td><td><input type="text" name="total-door3" id="total-door3" value=""></td><td><input type="text" name="totalby5-door3" id="totalby5-door3" value=""></td><td><input type="text" name="totalmod-door3" id="totalmod-door3" value=""></td></tr>
         <tr><td>unallocated</td><td><input type="text" name="total-unallocated" id="total-unallocated" value=""></td><td><input type="text" name="totalby5-unallocated" id="totalby5-unallocated" value=""></td><td>&nbsp;</td></tr>
         <tr><td>missing</td><td><input type="text" name="total-missing" id="total-missing" value=""></td><td>&nbsp;</td><td>&nbsp;</td></tr>
         <tr><td>overcount</td><td><input type="text" name="total-overcount" id="total-overcount" value=""></td><td>&nbsp;</td><td>&nbsp;</td></tr>
-        <tr><td>---</td><td>---</td><td>ignores missing/overcount</td><td>and ignore unallocated</td></tr>
-        <tr><td>total</td><td><input type="text" name="total-total" id="total-total" value=""></td><td><input type="text" name="totalby5-total" id="totalby5-total" value=""></td><td><input type="text" name="totalmod-total" id="totalmod-total" value=""></td></tr>
+        <tr><td>ignores</td><td>missing/overcount</td><td> missing/overcount</td><td>and ignore unallocated</td><td>and ignore door3</td></tr>
+        <tr><td>total</td><td><input type="text" name="total-total" id="total-total" value=""></td><td><input type="text" name="totalby5-total" id="totalby5-total" value=""></td><td><input type="text" name="totalmod-total" id="totalmod-total" value=""></td><td><input type="text" name="totalautomod-total" id="totalautomod-total" value=""></td></tr>
+        <tr><td>no personal</td><td><input type="text" name="total-work" id="total-work" value=""></td><td><input type="text" name="totalby5-work" id="totalby5-work" value=""></td><td><input type="text" name="totalmod-work" id="totalmod-work" value=""></td><td><input type="text" name="totalautomod-work" id="totalautomod-work" value=""></td></tr>
 
     </table>
-    <input type="text" name="total-mod" id="total-mod" value="1.25">
+
 </div>
-<input class="easyui-textbox" label="First Name:" labelPosition="top" style="width:100%;height:52px">
+
 <div id="table-controls">
     <div id="tabs-projects" class="tabs">
         <ul>
@@ -423,7 +441,7 @@ Healthcare
     </div>   <br>
 
     <div id="PGPF">
-        <h2>Greenhill</h2>
+        <h2>PGPF</h2>
         <h3><label>Keywords</label></h3>
         <textarea title="keywords-pgpf" id="keywords-pgpf" rows="5" cols="50">
 pgpf
@@ -500,6 +518,19 @@ Salon
 Trump
 Science
 Respondent.io
+att
+nonsense
+school
+freshdirect
+tigerdirect
+fluevog
+ebay
+haleagar.com
+ch131
+androidcentral
+putlocker
+shopgoodwill
+anki
         </textarea>
         <h3><label>Probably Keywords</label></h3>
         <textarea title="probablykeywords-personal" id="probablykeywords-personal" rows="5" cols="50">

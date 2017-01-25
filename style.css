@@ -86,3 +86,9 @@ tr.selected {
     top: 300px;
     left:30%;
 }
+input[type="text"] {
+
+}
+#total-mod, #total-automod {
+    width: 80px;
+}
