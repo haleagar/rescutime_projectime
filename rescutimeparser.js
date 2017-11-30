@@ -116,10 +116,15 @@ function getRescutimeData() {
             } else {
                 $('tr.row-UNALLOCATED').show();
             }
-            if($("input#checkbox-wahv")[0].checked) {
-                $('tr.row-WAHV').hide();
+            if($("input#checkbox-njit")[0].checked) {
+              $('tr.row-NJIT').hide();
             } else {
-                $('tr.row-WAHV').show();
+              $('tr.row-WAHV').show();
+            }
+            if($("input#checkbox-wahv")[0].checked) {
+              $('tr.row-WAHV').hide();
+            } else {
+              $('tr.row-WAHV').show();
             }
             if($("input#checkbox-greenhill")[0].checked) {
                 $('tr.row-GREENHILL').hide();

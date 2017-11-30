@@ -67,8 +67,9 @@
                 $('#totalby5-personal').val(min_hour_display(projtotals.PERSONAL));
                 $('#totalby5-door3').val(min_hour_display(projtotals.PERSONAL));
                 $('#totalby5-unallocated').val(min_hour_display(projtotals.UNALLOCATED));
+                $('#totalby5-njit').val(min_hour_display(projtotals.NJIT));
 
-                var by5total = projtotals.WAHV+projtotals.GREENHILL+projtotals.PCH+projtotals.PGPF+projtotals.RESOLUTION+projtotals.PERSONAL+projtotals.UNALLOCATED+projtotals.DOOR3;
+                var by5total = projtotals.WAHV+projtotals.GREENHILL+projtotals.PCH+projtotals.PGPF+projtotals.RESOLUTION+projtotals.PERSONAL+projtotals.UNALLOCATED+projtotals.DOOR3+projtotals.NJIT;
                 $('#totalby5-total').val(min_hour_display(by5total));
                 $('#totalby5-work').val(min_hour_display(by5total-projtotals.PERSONAL));
 
@@ -81,8 +82,9 @@
                 $('#totalmod-resolution').val(min_hour_display(projtotals.RESOLUTION*modval));
                 $('#totalmod-personal').val(min_hour_display(projtotals.PERSONAL*modval));
                 $('#totalmod-door3').val(min_hour_display(projtotals.DOOR3*modval));
+                $('#totalmod-njit').val(min_hour_display(projtotals.NJIT*modval));
 
-                var modtotal = projtotals.WAHV+projtotals.GREENHILL+projtotals.PCH+projtotals.PGPF+projtotals.RESOLUTION+projtotals.PERSONAL+projtotals.DOOR3;
+                var modtotal = projtotals.WAHV+projtotals.GREENHILL+projtotals.PCH+projtotals.PGPF+projtotals.RESOLUTION+projtotals.PERSONAL+projtotals.DOOR3+projtotals.NJIT;
                 $('#totalmod-total').val(min_hour_display(modtotal*modval));
                 $('#totalautomod-total').val(min_hour_display((modtotal-projtotals.DOOR3)*modval));
                 $('#totalmod-work').val(min_hour_display((modtotal-projtotals.PERSONAL)*modval));
@@ -91,6 +93,12 @@
                 $('#total-automod').val(automodval.toFixed(2));
 
 
+                var njittotal = 0;
+                $('td.col-NJIT').each(function() {
+                  njittotal += Number($(this).html());
+                });
+                $('#total-njit').val(min_hour_display(0,njittotal));
+              
                 var wahvtotal = 0;
                 $('td.col-WAHV').each(function() {
                     wahvtotal += Number($(this).html());
@@ -152,7 +160,7 @@
                 });
                 $('#total-overcount').val(min_hour_display(0,overcounttotal));
 
-                var sectotal = wahvtotal+greentotal+pchtotal+pgpftotal+restotal+persionaltotal+unallocatedtotal+door3total;
+                var sectotal = njittotal+wahvtotal+greentotal+pchtotal+pgpftotal+restotal+persionaltotal+unallocatedtotal+door3total;
                 $('#total-total').val(min_hour_display(0,sectotal));
                 $('#total-work').val(min_hour_display(0,sectotal-persionaltotal));
             });
@@ -184,21 +192,23 @@
 
             $('button#hide-proj-all').click( function( event ) {
                 $("input#checkbox-unallocated")[0].checked = false;
-                $("input#checkbox-unallocated").click()
+                $("input#checkbox-unallocated").click();
+                $("input#checkbox-njit")[0].checked = false;
+                $("input#checkbox-njit").click();
                 $("input#checkbox-wahv")[0].checked = false;
-                $("input#checkbox-wahv").click()
+                $("input#checkbox-wahv").click();
                 $("input#checkbox-greenhill")[0].checked = false;
-                $("input#checkbox-greenhill").click()
+                $("input#checkbox-greenhill").click();
                 $("input#checkbox-pch")[0].checked = false;
-                $("input#checkbox-pch").click()
+                $("input#checkbox-pch").click();
                 $("input#checkbox-pgpf")[0].checked = false;
-                $("input#checkbox-pgpf").click()
+                $("input#checkbox-pgpf").click();
                 $("input#checkbox-resolution")[0].checked = false;
-                $("input#checkbox-resolution").click()
+                $("input#checkbox-resolution").click();
                 $("input#checkbox-personal")[0].checked = false;
-                $("input#checkbox-personal").click()
+                $("input#checkbox-personal").click();
                 $("input#checkbox-door3")[0].checked = false;
-                $("input#checkbox-door3").click()
+                $("input#checkbox-door3").click();
             });
             $("input#checkbox-unallocated").change(function() {
                 if(this.checked) {
@@ -207,12 +217,19 @@
                     $('tr.row-UNALLOCATED').show();
                 }
             });
+            $("input#checkbox-njit").change(function() {
+              if(this.checked) {
+                $('tr.row-NJIT').hide();
+              } else {
+                $('tr.row-NJIT').show();
+              }
+            });
             $("input#checkbox-wahv").change(function() {
-                if(this.checked) {
-                    $('tr.row-WAHV').hide();
-                } else {
-                    $('tr.row-WAHV').show();
-                }
+              if(this.checked) {
+                $('tr.row-WAHV').hide();
+              } else {
+                $('tr.row-WAHV').show();
+              }
             });
             $("input#checkbox-greenhill").change(function() {
                 if(this.checked) {
@@ -269,7 +286,7 @@
 
     </script>
 </head>
-<body>
+<>
 todo
 <ul>
     <li>http://www.jeasyui.com/demo/main/index.php?plugin=DataGrid&theme=default&dir=ltr&pitem=</li>
@@ -287,6 +304,7 @@ todo
 
 
 </ul>
+<a href="https://projectorpsa.com" target="_blank">projector</a>
 
 <label>Pick a day to load: </label><div id="datepicker"></div>
 <button id="load-data" class="ui-button ui-widget ui-corner-all">load data</button>
@@ -297,6 +315,7 @@ todo
         <tr><td>greenhill</td><td><input type="text" name="total-greenhill" id="total-greenhill" value=""></td><td><input type="text" name="totalby5-greenhill" id="totalby5-greenhill" value=""></td><td><input type="text" name="totalmod-greenhill" id="totalmod-greenhill" value=""></td></tr>
         <tr><td>pch</td><td><input type="text" name="total-pch" id="total-pch" value=""></td><td><input type="text" name="totalby5-pch" id="totalby5-pch" value=""></td><td><input type="text" name="totalmod-pch" id="totalmod-pch" value=""></td></tr>
         <tr><td>pgpf</td><td><input type="text" name="total-pgpf" id="total-pgpf" value=""></td><td><input type="text" name="totalby5-pgpf" id="totalby5-pgpf" value=""></td><td><input type="text" name="totalmod-pgpf" id="totalmod-pgpf" value=""></td></tr>
+        <tr><td>njit</td><td><input type="text" name="total-njit" id="total-njit" value=""></td><td><input type="text" name="totalby5-njit" id="totalby5-njit" value=""></td><td><input type="text" name="totalmod-njit" id="totalmod-njit" value=""></td></tr>
         <tr><td>wahv</td><td><input type="text" name="total-wahv" id="total-wahv" value=""></td><td><input type="text" name="totalby5-wahv" id="totalby5-wahv" value=""></td><td><input type="text" name="totalmod-wahv" id="totalmod-wahv" value=""></td></tr>
         <tr><td>resolution</td><td><input type="text" name="total-resolution" id="total-resolution" value=""></td><td><input type="text" name="totalby5-resolution" id="totalby5-resolution" value=""></td><td><input type="text" name="totalmod-resolution" id="totalmod-resolution" value=""></td></tr>
         <tr><td>personal</td><td><input type="text" name="total-personal" id="total-personal" value=""></td><td><input type="text" name="totalby5-personal" id="totalby5-personal" value=""></td><td><input type="text" name="totalmod-personal" id="totalmod-personal" value=""></td></tr>
@@ -334,8 +353,11 @@ todo
         <label for="checkbox-unallocated">UNALLOCATED
             <input type="checkbox" name="checkbox-unallocated" id="checkbox-unallocated">
         </label>
+        <label for="checkbox-njit">NJIT
+          <input type="checkbox" name="checkbox-njit" id="checkbox-njit">
+        </label>
         <label for="checkbox-wahv">WAHV
-            <input type="checkbox" name="checkbox-wahv" id="checkbox-wahv">
+          <input type="checkbox" name="checkbox-wahv" id="checkbox-wahv">
         </label>
         <label for="checkbox-greenhill">Greenhill
             <input type="checkbox" name="checkbox-Greenhill" id="checkbox-greenhill">
@@ -381,13 +403,25 @@ postgres
 knex
 data:
 pgsql
+psql
 bdd
+pgadmin3
+bullhorn
+pgadmin3
+sendgridparse
+whaveqa1
+whaveqa2
+pgadmin3
+ie11tester
+WHAVE
+QA One
         </textarea>
         <h3><label>Probably Keywords</label></h3>
         <textarea title="probablykeywords-wahv" id="probablykeywords-wahv" rows="5" cols="50">
 chimp
 webdriver
 cucumber
+selenium
 reports
 node.js
 node
@@ -396,8 +430,13 @@ mailinator
 nodejs
 npm
 github
-Zeplin
-jira
+vnc
+remmina
+IETester
+:3000
+SendGrid
+Confluence
+Multi Tenant
         </textarea>
     </div>    <br>
 
@@ -417,10 +456,19 @@ Greehill
 global-presence
 panopoly
 fuzzysearch
+local.greenhill.com
+wwwgreenhillcom
+test-greenhill.pantheonsite.io
+dev-greenhill.pantheonsite.io
         </textarea>
         <h3><label>Probably Keywords</label></h3>
         <textarea title="probablykeywords-green" id="probablykeywords-green" rows="5" cols="50">
 Adobe Photoshop CS5.1
+japan
+i18n
+Babenko
+Vlad
+Basit
         </textarea>
     </div>   <br>
 
@@ -436,6 +484,7 @@ lance
 teegarden
 petersonhealthcare
 Peterson Health
+petersonhealthcareorg
         </textarea>
         <h3><label>Probably Keywords</label></h3>
         <textarea title="probablykeywords-pch" id="probablykeywords-pch" rows="5" cols="50">
@@ -449,6 +498,10 @@ Healthcare
         <h3><label>Keywords</label></h3>
         <textarea title="keywords-pgpf" id="keywords-pgpf" rows="5" cols="50">
 pgpf
+dev.pgpf.org
+test.pgpf.org
+pgpf.org
+wwwpgpforg
 6484fc6e-2a7a-4cef-b80a-a117593f3345
 02dce34e-3e42-4d40-9055-0b82e3ab7849
 curry
@@ -456,12 +509,15 @@ anila
 Peter G. Peterson Foundation
 Interactive Quiz
 fiscalship
+Fiscal Summit
+Fiscal Confidence
 </textarea>
         <h3><label>Probably Keywords</label></h3>
         <textarea title="probablykeywords-pgpf" id="probablykeywords-pgpf" rows="5" cols="50">
 ctsiokos
 costa
 tsiokos
+The Latest -
         </textarea>
     </div>   <br>
 
@@ -475,6 +531,8 @@ linode
 george
 tsiatis
 32542c10-f441-408f-ad12-556bb7d57dd4
+haleagar.atlassian.net
+iContact
         </textarea>
         <h3><label>Probably Keywords</label></h3>
         <textarea title="probablykeywords-res" id="probablykeywords-res" rows="5" cols="50">
@@ -544,7 +602,28 @@ Epson Stylus
 family
 Flickr
 new york times
+vacations
 Salt Chunk Mary
+smile.amazon.com
+discover.com
+allies
+Wonder League
+[Wonder
+cipher
+Gravity Falls
+Jennifer Choi
+Choi
+Mew Mew
+Wonder League
+ASD Nest
+ASDNestParents
+ASD/Nest
+Flickr
+Kathryn Eagar
+Frank Ford
+ps84nest
+ps84
+notebookcheck
         </textarea>
         <h3><label>Probably Keywords</label></h3>
         <textarea title="probablykeywords-personal" id="probablykeywords-personal" rows="5" cols="50">
@@ -554,6 +633,11 @@ facebook
 Hal Eagar Theatrical Solutions
 3d print
 wdw
+Amazon.com
+YouTube
+ASD
+Christmas
+Black Friday
         </textarea>
 
         <h3><label>category Keywords</label></h3>
@@ -586,6 +670,15 @@ Nayoung Kim
 Michael Montecuollo
 DOOR3 Business Applications
 Erica Modelfino
+door3nyc.atlassian.net
+searchmonkey
+DW-
+door3website
+door3-v3-pantheon
+door3-website
+59cb31c9-eab5-48a9-a784-40822d6a6439
+D3W
+Door3 Website
         </textarea>
         <h3><label>Probably Keywords</label></h3>
         <textarea title="probablykeywords-door3" id="probablykeywords-door3" rows="5" cols="50">
@@ -593,10 +686,12 @@ jetbrains
 phpstorm
 pantheon
 backtrac
+zeplin.io
 jira
 atlassian
 github
 Zeplin
+browserstack
 sow
 estimate
 matrix
@@ -632,13 +727,48 @@ MintCinnamon
 ubuntu
 grepWin
 Code
+slack.com
+builtwith.com
+dima
+drew
+Create New Branch
+Update Project
+jetbrains-phpstorm
+Analytics
+door3nyc
         </textarea>
         <h3><label>category Keywords</label></h3>
         <textarea title="categorykeywords-door3" id="categorykeywords-door3" rows="5" cols="50">
 General Software Development
+Engineering & Technology
+Intelligence
+Editing & IDEs
+Meetings
+General Communication & Scheduling
         </textarea>
     </div>   <br>
-
+  
+  
+  
+  
+  <div id="njit">
+    <h2>NJIT</h2>
+    <h3><label>Keywords</label></h3>
+    <textarea title="keywords-njit" id="keywords-njit" rows="5" cols="50">
+njit
+NJIT
+njit.door3dev.com
+njit.edu
+localhost:8000
+        </textarea>
+    <h3><label>Probably Keywords</label></h3>
+    <textarea title="probablykeywords-njit" id="probablykeywords-njit" rows="5" cols="50">
+njit
+NJIT
+Home page - Google Chrome
+        </textarea>
+  </div>    <br>
+  
 </div><br>
 <div id="loading-overlay"><div id="loading-text">loading ...</div></div>
 </body>

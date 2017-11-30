@@ -7,8 +7,11 @@ $( function() {
     document.probablyproj = {};
     document.categoryproj = {};
 
-    document.proj['WAHV'] = $('#keywords-wahv').val().toLowerCase().trim().split("\n");
-    document.probablyproj['WAHV'] = $('#probablykeywords-wahv').val().toLowerCase().trim().split("\n");
+      document.proj['NJIT'] = $('#keywords-njit').val().toLowerCase().trim().split("\n");
+      document.probablyproj['NJIT'] = $('#probablykeywords-njit').val().toLowerCase().trim().split("\n");
+
+      document.proj['WAHV'] = $('#keywords-wahv').val().toLowerCase().trim().split("\n");
+      document.probablyproj['WAHV'] = $('#probablykeywords-wahv').val().toLowerCase().trim().split("\n");
 
     document.proj['GREENHILL'] = $('#keywords-green').val().toLowerCase().trim().split("\n");
     document.probablyproj['GREENHILL'] = $('#probablykeywords-green').val().toLowerCase().trim().split("\n");
