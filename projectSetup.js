@@ -7,8 +7,17 @@ $( function() {
     document.probablyproj = {};
     document.categoryproj = {};
 
-      document.proj['NJIT'] = $('#keywords-njit').val().toLowerCase().trim().split("\n");
-      document.probablyproj['NJIT'] = $('#probablykeywords-njit').val().toLowerCase().trim().split("\n");
+  document.proj['dgi'] = $('#keywords-dgi').val().toLowerCase().trim().split("\n");
+  document.probablyproj['dgi'] = $('#probablykeywords-dgi').val().toLowerCase().trim().split("\n");
+
+  document.proj['proj1'] = $('#keywords-proj1').val().toLowerCase().trim().split("\n");
+  document.probablyproj['proj1'] = $('#probablykeywords-proj1').val().toLowerCase().trim().split("\n");
+
+  document.proj['proj2'] = $('#keywords-proj2').val().toLowerCase().trim().split("\n");
+  document.probablyproj['proj2'] = $('#probablykeywords-proj2').val().toLowerCase().trim().split("\n");
+
+  document.proj['NJIT'] = $('#keywords-njit').val().toLowerCase().trim().split("\n");
+  document.probablyproj['NJIT'] = $('#probablykeywords-njit').val().toLowerCase().trim().split("\n");
 
       document.proj['WAHV'] = $('#keywords-wahv').val().toLowerCase().trim().split("\n");
       document.probablyproj['WAHV'] = $('#probablykeywords-wahv').val().toLowerCase().trim().split("\n");

@@ -119,7 +119,22 @@ function getRescutimeData() {
             if($("input#checkbox-njit")[0].checked) {
               $('tr.row-NJIT').hide();
             } else {
-              $('tr.row-WAHV').show();
+              $('tr.row-njit').show();
+            }
+            if($("input#checkbox-dgi")[0].checked) {
+              $('tr.row-dgi').hide();
+            } else {
+              $('tr.row-dgi').show();
+            }
+            if($("input#checkbox-proj1")[0].checked) {
+              $('tr.row-proj1').hide();
+            } else {
+              $('tr.row-proj2').show();
+            }
+            if($("input#checkbox-proj2")[0].checked) {
+              $('tr.row-proj2').hide();
+            } else {
+              $('tr.row-proj2').show();
             }
             if($("input#checkbox-wahv")[0].checked) {
               $('tr.row-WAHV').hide();

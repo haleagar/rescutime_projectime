@@ -68,6 +68,9 @@
                 $('#totalby5-door3').val(min_hour_display(projtotals.PERSONAL));
                 $('#totalby5-unallocated').val(min_hour_display(projtotals.UNALLOCATED));
                 $('#totalby5-njit').val(min_hour_display(projtotals.NJIT));
+                $('#totalby5-dgi').val(min_hour_display(projtotals.dgi));
+                $('#totalby5-proj1').val(min_hour_display(projtotals.proj1));
+                $('#totalby5-proj2').val(min_hour_display(projtotals.proj2));
 
                 var by5total = projtotals.WAHV+projtotals.GREENHILL+projtotals.PCH+projtotals.PGPF+projtotals.RESOLUTION+projtotals.PERSONAL+projtotals.UNALLOCATED+projtotals.DOOR3+projtotals.NJIT;
                 $('#totalby5-total').val(min_hour_display(by5total));
@@ -83,8 +86,11 @@
                 $('#totalmod-personal').val(min_hour_display(projtotals.PERSONAL*modval));
                 $('#totalmod-door3').val(min_hour_display(projtotals.DOOR3*modval));
                 $('#totalmod-njit').val(min_hour_display(projtotals.NJIT*modval));
+                $('#totalmod-dgi').val(min_hour_display(projtotals.dgi*modval));
+                $('#totalmod-proj1').val(min_hour_display(projtotals.proj1*modval));
+                $('#totalmod-proj2').val(min_hour_display(projtotals.proj2*modval));
 
-                var modtotal = projtotals.WAHV+projtotals.GREENHILL+projtotals.PCH+projtotals.PGPF+projtotals.RESOLUTION+projtotals.PERSONAL+projtotals.DOOR3+projtotals.NJIT;
+                var modtotal = projtotals.WAHV+projtotals.GREENHILL+projtotals.PCH+projtotals.PGPF+projtotals.RESOLUTION+projtotals.PERSONAL+projtotals.DOOR3+projtotals.NJIT+projtotals.dgi+projtotals.proj1+projtotals.proj2;
                 $('#totalmod-total').val(min_hour_display(modtotal*modval));
                 $('#totalautomod-total').val(min_hour_display((modtotal-projtotals.DOOR3)*modval));
                 $('#totalmod-work').val(min_hour_display((modtotal-projtotals.PERSONAL)*modval));
@@ -98,6 +104,24 @@
                   njittotal += Number($(this).html());
                 });
                 $('#total-njit').val(min_hour_display(0,njittotal));
+              
+                var dgitotal = 0;
+                $('td.col-dgi').each(function() {
+                  dgitotal += Number($(this).html());
+                });
+                $('#total-dgi').val(min_hour_display(0,dgitotal));
+  
+                var proj1total = 0;
+                $('td.col-proj1').each(function() {
+                  proj1total += Number($(this).html());
+                });
+                $('#total-proj1').val(min_hour_display(0,proj1total));
+  
+                var proj2total = 0;
+                $('td.col-proj2').each(function() {
+                  proj2total += Number($(this).html());
+                });
+                $('#total-proj2').val(min_hour_display(0,proj2total));
               
                 var wahvtotal = 0;
                 $('td.col-WAHV').each(function() {
@@ -160,7 +184,7 @@
                 });
                 $('#total-overcount').val(min_hour_display(0,overcounttotal));
 
-                var sectotal = njittotal+wahvtotal+greentotal+pchtotal+pgpftotal+restotal+persionaltotal+unallocatedtotal+door3total;
+                var sectotal = njittotal+dgitotal+proj1total+proj2total+wahvtotal+greentotal+pchtotal+pgpftotal+restotal+persionaltotal+unallocatedtotal+door3total;
                 $('#total-total').val(min_hour_display(0,sectotal));
                 $('#total-work').val(min_hour_display(0,sectotal-persionaltotal));
             });
@@ -195,6 +219,12 @@
                 $("input#checkbox-unallocated").click();
                 $("input#checkbox-njit")[0].checked = false;
                 $("input#checkbox-njit").click();
+                $("input#checkbox-dgi")[0].checked = false;
+                $("input#checkbox-dgi").click();
+                $("input#checkbox-proj1")[0].checked = false;
+                $("input#checkbox-proj1").click();
+                $("input#checkbox-proj2")[0].checked = false;
+                $("input#checkbox-proj2").click();
                 $("input#checkbox-wahv")[0].checked = false;
                 $("input#checkbox-wahv").click();
                 $("input#checkbox-greenhill")[0].checked = false;
@@ -222,6 +252,27 @@
                 $('tr.row-NJIT').hide();
               } else {
                 $('tr.row-NJIT').show();
+              }
+            });
+            $("input#checkbox-dgi").change(function() {
+              if(this.checked) {
+                $('tr.row-dgi').hide();
+              } else {
+                $('tr.row-dgi').show();
+              }
+            });
+            $("input#checkbox-proj1").change(function() {
+              if(this.checked) {
+                $('tr.row-proj1').hide();
+              } else {
+                $('tr.row-proj1').show();
+              }
+            });
+            $("input#checkbox-proj2").change(function() {
+              if(this.checked) {
+                $('tr.row-proj2').hide();
+              } else {
+                $('tr.row-proj2').show();
               }
             });
             $("input#checkbox-wahv").change(function() {
@@ -316,6 +367,9 @@ todo
         <tr><td>pch</td><td><input type="text" name="total-pch" id="total-pch" value=""></td><td><input type="text" name="totalby5-pch" id="totalby5-pch" value=""></td><td><input type="text" name="totalmod-pch" id="totalmod-pch" value=""></td></tr>
         <tr><td>pgpf</td><td><input type="text" name="total-pgpf" id="total-pgpf" value=""></td><td><input type="text" name="totalby5-pgpf" id="totalby5-pgpf" value=""></td><td><input type="text" name="totalmod-pgpf" id="totalmod-pgpf" value=""></td></tr>
         <tr><td>njit</td><td><input type="text" name="total-njit" id="total-njit" value=""></td><td><input type="text" name="totalby5-njit" id="totalby5-njit" value=""></td><td><input type="text" name="totalmod-njit" id="totalmod-njit" value=""></td></tr>
+        <tr><td>dgi</td><td><input type="text" name="total-dgi" id="total-dgi" value=""></td><td><input type="text" name="totalby5-dgi" id="totalby5-dgi" value=""></td><td><input type="text" name="totalmod-dgi" id="totalmod-dgi" value=""></td></tr>
+        <tr><td>proj1</td><td><input type="text" name="total-proj1" id="total-proj1" value=""></td><td><input type="text" name="totalby5-proj1" id="totalby5-proj1" value=""></td><td><input type="text" name="totalmod-proj1" id="totalmod-proj1" value=""></td></tr>
+        <tr><td>proj2</td><td><input type="text" name="total-proj2" id="total-proj2" value=""></td><td><input type="text" name="totalby5-proj2" id="totalby5-proj2" value=""></td><td><input type="text" name="totalmod-proj2" id="totalmod-proj2" value=""></td></tr>
         <tr><td>wahv</td><td><input type="text" name="total-wahv" id="total-wahv" value=""></td><td><input type="text" name="totalby5-wahv" id="totalby5-wahv" value=""></td><td><input type="text" name="totalmod-wahv" id="totalmod-wahv" value=""></td></tr>
         <tr><td>resolution</td><td><input type="text" name="total-resolution" id="total-resolution" value=""></td><td><input type="text" name="totalby5-resolution" id="totalby5-resolution" value=""></td><td><input type="text" name="totalmod-resolution" id="totalmod-resolution" value=""></td></tr>
         <tr><td>personal</td><td><input type="text" name="total-personal" id="total-personal" value=""></td><td><input type="text" name="totalby5-personal" id="totalby5-personal" value=""></td><td><input type="text" name="totalmod-personal" id="totalmod-personal" value=""></td></tr>
@@ -355,6 +409,15 @@ todo
         </label>
         <label for="checkbox-njit">NJIT
           <input type="checkbox" name="checkbox-njit" id="checkbox-njit">
+        </label>
+        <label for="checkbox-proj2">proj2
+          <input type="checkbox" name="checkbox-proj2" id="checkbox-proj2">
+        </label>
+        <label for="checkbox-proj1">proj1
+          <input type="checkbox" name="checkbox-proj1" id="checkbox-proj1">
+        </label>
+        <label for="checkbox-dgi">dgi
+          <input type="checkbox" name="checkbox-dgi" id="checkbox-dgi">
         </label>
         <label for="checkbox-wahv">WAHV
           <input type="checkbox" name="checkbox-wahv" id="checkbox-wahv">
@@ -736,6 +799,7 @@ Update Project
 jetbrains-phpstorm
 Analytics
 door3nyc
+DW
         </textarea>
         <h3><label>category Keywords</label></h3>
         <textarea title="categorykeywords-door3" id="categorykeywords-door3" rows="5" cols="50">
@@ -747,8 +811,6 @@ Meetings
 General Communication & Scheduling
         </textarea>
     </div>   <br>
-  
-  
   
   
   <div id="njit">
@@ -768,6 +830,56 @@ NJIT
 Home page - Google Chrome
         </textarea>
   </div>    <br>
+  
+  <div id="dgi">
+    <h2>dgi</h2>
+    <h3><label>Keywords</label></h3>
+    <textarea title="keywords-dgi" id="keywords-dgi" rows="5" cols="50">
+dgi
+bridgetodata
+DGI
+DDU
+dev-bridgetodata8
+734175d0-4910-470a-a7ca-326a99034928
+bridgetodata8
+        </textarea>
+    <h3><label>Probably Keywords</label></h3>
+    <textarea title="probablykeywords-dgi" id="probablykeywords-dgi" rows="5" cols="50">
+dgi
+docker
+drupal8
+        </textarea>
+  </div>    <br>
+  
+  
+  
+  <div id="proj1">
+    <h2>proj1</h2>
+    <h3><label>Keywords</label></h3>
+    <textarea title="keywords-proj1" id="keywords-proj1" rows="5" cols="50">
+proj1
+        </textarea>
+    <h3><label>Probably Keywords</label></h3>
+    <textarea title="probablykeywords-proj1" id="probablykeywords-proj1" rows="5" cols="50">
+proj1
+        </textarea>
+  </div>    <br>
+  
+  
+  
+  <div id="proj2">
+    <h2>proj2</h2>
+    <h3><label>Keywords</label></h3>
+    <textarea title="keywords-proj2" id="keywords-proj2" rows="5" cols="50">
+proj2
+        </textarea>
+    <h3><label>Probably Keywords</label></h3>
+    <textarea title="probablykeywords-proj2" id="probablykeywords-proj2" rows="5" cols="50">
+proj2
+        </textarea>
+  </div>    <br>
+  
+  
   
 </div><br>
 <div id="loading-overlay"><div id="loading-text">loading ...</div></div>
