@@ -54,7 +54,7 @@ function getRescutimeData() {
             $.each( document.proj, function( projname, keywords ) {
                 if (rowObj['project'] == 'UNALLOCATED') {
                     if (title.toLowerCase().trim() == 'no details') { title = app; }
-                    if (title.toLowerCase().indexOf('New Tab') >= 0) { title = app; }
+                    if (title.indexOf('New Tab') >= 0) { title = app; }
                     if (keywords.some(function (v) {
                             return (title).toLowerCase().indexOf(v) >= 0;
                         })) {
