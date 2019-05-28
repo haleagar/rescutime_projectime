@@ -136,10 +136,10 @@ function getRescutimeData() {
             } else {
               $('tr.row-proj2').show();
             }
-            if($("input#checkbox-wahv")[0].checked) {
-              $('tr.row-WAHV').hide();
+            if($("input#checkbox-powerbi")[0].checked) {
+              $('tr.row-POWERBI').hide();
             } else {
-              $('tr.row-WAHV').show();
+              $('tr.row-POWERBI').show();
             }
             if($("input#checkbox-greenhill")[0].checked) {
                 $('tr.row-GREENHILL').hide();
@@ -176,9 +176,9 @@ function getRescutimeData() {
         $('#loading-overlay').hide();
 
 //                    document.jsonQobj=jsonQ(document.strucData);
-//                    document.WAHV = document.jsonQobj.find('document',function () {
-//                        return this[3].toLowerCase().indexOf('wahv') !== -1;
-//                        //return this[0].toLowerCase().includes('wahv');
+//                    document.POWERBI = document.jsonQobj.find('document',function () {
+//                        return this[3].toLowerCase().indexOf('powerbi') !== -1;
+//                        //return this[0].toLowerCase().includes('powerbi');
 //                    });
 
     });

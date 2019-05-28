@@ -59,7 +59,7 @@
                     });
                 });
 
-                $('#totalby5-wahv').val(min_hour_display(projtotals.WAHV));
+                $('#totalby5-powerbi').val(min_hour_display(projtotals.POWERBI));
                 $('#totalby5-greenhill').val(min_hour_display(projtotals.GREENHILL));
                 $('#totalby5-pch').val(min_hour_display(projtotals.PCH));
                 $('#totalby5-pgpf').val(min_hour_display(projtotals.PGPF));
@@ -72,13 +72,13 @@
                 $('#totalby5-proj1').val(min_hour_display(projtotals.proj1));
                 $('#totalby5-proj2').val(min_hour_display(projtotals.proj2));
 
-                var by5total = projtotals.WAHV+projtotals.GREENHILL+projtotals.PCH+projtotals.PGPF+projtotals.RESOLUTION+projtotals.PERSONAL+projtotals.UNALLOCATED+projtotals.DOOR3+projtotals.NJIT;
+                var by5total = projtotals.POWERBI+projtotals.GREENHILL+projtotals.PCH+projtotals.PGPF+projtotals.RESOLUTION+projtotals.PERSONAL+projtotals.UNALLOCATED+projtotals.DOOR3+projtotals.NJIT;
                 $('#totalby5-total').val(min_hour_display(by5total));
                 $('#totalby5-work').val(min_hour_display(by5total-projtotals.PERSONAL));
 
                 var modval = Number($('#total-mod').val());
 
-                $('#totalmod-wahv').val(min_hour_display(projtotals.WAHV*modval));
+                $('#totalmod-powerbi').val(min_hour_display(projtotals.POWERBI*modval));
                 $('#totalmod-greenhill').val(min_hour_display(projtotals.GREENHILL*modval));
                 $('#totalmod-pch').val(min_hour_display(projtotals.PCH*modval));
                 $('#totalmod-pgpf').val(min_hour_display(projtotals.PGPF*modval));
@@ -90,7 +90,7 @@
                 $('#totalmod-proj1').val(min_hour_display(projtotals.proj1*modval));
                 $('#totalmod-proj2').val(min_hour_display(projtotals.proj2*modval));
 
-                var modtotal = projtotals.WAHV+projtotals.GREENHILL+projtotals.PCH+projtotals.PGPF+projtotals.RESOLUTION+projtotals.PERSONAL+projtotals.DOOR3+projtotals.NJIT+projtotals.dgi+projtotals.proj1+projtotals.proj2;
+                var modtotal = projtotals.POWERBI+projtotals.GREENHILL+projtotals.PCH+projtotals.PGPF+projtotals.RESOLUTION+projtotals.PERSONAL+projtotals.DOOR3+projtotals.NJIT+projtotals.dgi+projtotals.proj1+projtotals.proj2;
                 $('#totalmod-total').val(min_hour_display(modtotal*modval));
                 $('#totalautomod-total').val(min_hour_display((modtotal-projtotals.DOOR3)*modval));
                 $('#totalmod-work').val(min_hour_display((modtotal-projtotals.PERSONAL)*modval));
@@ -123,11 +123,11 @@
                 });
                 $('#total-proj2').val(min_hour_display(0,proj2total));
 
-                var wahvtotal = 0;
-                $('td.col-WAHV').each(function() {
-                    wahvtotal += Number($(this).html());
+                var powerbitotal = 0;
+                $('td.col-POWERBI').each(function() {
+                    powerbitotal += Number($(this).html());
                 });
-                $('#total-wahv').val(min_hour_display(0,wahvtotal));
+                $('#total-powerbi').val(min_hour_display(0,powerbitotal));
 
                 var greentotal = 0;
                 $('td.col-GREENHILL').each(function() {
@@ -184,7 +184,7 @@
                 });
                 $('#total-overcount').val(min_hour_display(0,overcounttotal));
 
-                var sectotal = njittotal+dgitotal+proj1total+proj2total+wahvtotal+greentotal+pchtotal+pgpftotal+restotal+persionaltotal+unallocatedtotal+door3total;
+                var sectotal = njittotal+dgitotal+proj1total+proj2total+powerbitotal+greentotal+pchtotal+pgpftotal+restotal+persionaltotal+unallocatedtotal+door3total;
                 $('#total-total').val(min_hour_display(0,sectotal));
                 $('#total-work').val(min_hour_display(0,sectotal-persionaltotal));
             });
@@ -225,8 +225,8 @@
                 $("input#checkbox-proj1").click();
                 $("input#checkbox-proj2")[0].checked = false;
                 $("input#checkbox-proj2").click();
-                $("input#checkbox-wahv")[0].checked = false;
-                $("input#checkbox-wahv").click();
+                $("input#checkbox-powerbi")[0].checked = false;
+                $("input#checkbox-powerbi").click();
                 $("input#checkbox-greenhill")[0].checked = false;
                 $("input#checkbox-greenhill").click();
                 $("input#checkbox-pch")[0].checked = false;
@@ -275,11 +275,11 @@
                 $('tr.row-proj2').show();
               }
             });
-            $("input#checkbox-wahv").change(function() {
+            $("input#checkbox-powerbi").change(function() {
               if(this.checked) {
-                $('tr.row-WAHV').hide();
+                $('tr.row-POWERBI').hide();
               } else {
-                $('tr.row-WAHV').show();
+                $('tr.row-POWERBI').show();
               }
             });
             $("input#checkbox-greenhill").change(function() {
@@ -370,9 +370,9 @@ todo
         <tr><td>pgpf</td><td><input type="text" name="total-pgpf" id="total-pgpf" value=""></td><td><input type="text" name="totalby5-pgpf" id="totalby5-pgpf" value=""></td><td><input type="text" name="totalmod-pgpf" id="totalmod-pgpf" value=""></td></tr>
         <tr><td>NJIT or quislex</td><td><input type="text" name="total-njit" id="total-njit" value=""></td><td><input type="text" name="totalby5-njit" id="totalby5-njit" value=""></td><td><input type="text" name="totalmod-njit" id="totalmod-njit" value=""></td></tr>
         <tr><td>dgi</td><td><input type="text" name="total-dgi" id="total-dgi" value=""></td><td><input type="text" name="totalby5-dgi" id="totalby5-dgi" value=""></td><td><input type="text" name="totalmod-dgi" id="totalmod-dgi" value=""></td></tr>
-        <tr><td>proj1 blace</td><td><input type="text" name="total-proj1" id="total-proj1" value=""></td><td><input type="text" name="totalby5-proj1" id="totalby5-proj1" value=""></td><td><input type="text" name="totalmod-proj1" id="totalmod-proj1" value=""></td></tr>
+        <tr><td>proj1 chubb</td><td><input type="text" name="total-proj1" id="total-proj1" value=""></td><td><input type="text" name="totalby5-proj1" id="totalby5-proj1" value=""></td><td><input type="text" name="totalmod-proj1" id="totalmod-proj1" value=""></td></tr>
         <tr><td>proj2 gyftpal</td><td><input type="text" name="total-proj2" id="total-proj2" value=""></td><td><input type="text" name="totalby5-proj2" id="totalby5-proj2" value=""></td><td><input type="text" name="totalmod-proj2" id="totalmod-proj2" value=""></td></tr>
-        <tr><td>wahv</td><td><input type="text" name="total-wahv" id="total-wahv" value=""></td><td><input type="text" name="totalby5-wahv" id="totalby5-wahv" value=""></td><td><input type="text" name="totalmod-wahv" id="totalmod-wahv" value=""></td></tr>
+        <tr><td>powerbi</td><td><input type="text" name="total-powerbi" id="total-powerbi" value=""></td><td><input type="text" name="totalby5-powerbi" id="totalby5-powerbi" value=""></td><td><input type="text" name="totalmod-powerbi" id="totalmod-powerbi" value=""></td></tr>
         <tr><td>resolution</td><td><input type="text" name="total-resolution" id="total-resolution" value=""></td><td><input type="text" name="totalby5-resolution" id="totalby5-resolution" value=""></td><td><input type="text" name="totalmod-resolution" id="totalmod-resolution" value=""></td></tr>
         <tr><td>personal</td><td><input type="text" name="total-personal" id="total-personal" value=""></td><td><input type="text" name="totalby5-personal" id="totalby5-personal" value=""></td><td><input type="text" name="totalmod-personal" id="totalmod-personal" value=""></td></tr>
         <tr><td>door3</td><td><input type="text" name="total-door3" id="total-door3" value=""></td><td><input type="text" name="totalby5-door3" id="totalby5-door3" value=""></td><td><input type="text" name="totalmod-door3" id="totalmod-door3" value=""></td></tr>
@@ -421,8 +421,8 @@ todo
         <label for="checkbox-dgi">dgi
           <input type="checkbox" name="checkbox-dgi" id="checkbox-dgi">
         </label>
-        <label for="checkbox-wahv">WAHV
-          <input type="checkbox" name="checkbox-wahv" id="checkbox-wahv">
+        <label for="checkbox-powerbi">POWERBI
+          <input type="checkbox" name="checkbox-powerbi" id="checkbox-powerbi">
         </label>
         <label for="checkbox-greenhill">Greenhill
             <input type="checkbox" name="checkbox-Greenhill" id="checkbox-greenhill">
@@ -487,6 +487,27 @@ ietester
 sendgrid
 confluence
 multi tenant
+        </textarea>
+    </div>    <br>
+
+    <div id="powerbi">
+        <h2>POWERBI</h2>
+        <h3><label>Keywords</label></h3>
+        <textarea title="keywords-powerbi" id="keywords-powerbi" rows="5" cols="50">
+powerbi
+pbix
+dax
+power
+powerbi.com
+udemy
+sqlbi
+brett
+strugats
+        </textarea>
+        <h3><label>Probably Keywords</label></h3>
+        <textarea title="probablykeywords-powerbi" id="probablykeywords-powerbi" rows="5" cols="50">
+excel
+mssql
         </textarea>
     </div>    <br>
 
@@ -897,10 +918,18 @@ select option
 
 
   <div id="proj1">
-    <h2>proj1 blace</h2>
+    <h2>proj1 chubb</h2>
     <h3><label>Keywords</label></h3>
     <textarea title="keywords-proj1" id="keywords-proj1" rows="5" cols="50">
-blace
+chub
+chubb
+najiraprodenvironment
+acegroup
+TM-
+chubb-tracker-2
+tracker-2
+tracker
+angular
         </textarea>
     <h3><label>Probably Keywords</label></h3>
     <textarea title="probablykeywords-proj1" id="probablykeywords-proj1" rows="5" cols="50">
@@ -939,6 +968,11 @@ telegram
 font
 cooper
 YoungSerif
+after effects
+aftereffects
+Photoshop
+afterfx
+Composition
         </textarea>
     <h3><label>Probably Keywords</label></h3>
     <textarea title="probablykeywords-proj2" id="probablykeywords-proj2" rows="5" cols="50">
